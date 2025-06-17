@@ -91,5 +91,23 @@ OFFSET 50 ROWS /* Ignora as 50 primeiras linhas */
 FETCH NEXT 10 ROWS ONLY /*Este comando executa as proxima;s 10 linhas somente  */
 
 
+SELECT top 1000
+BusinessEntityID,
+FirstName,
+LastName
+from Person.Person
+ORDER By LastName;
+
+select top 1000
+BusinessEntityID,
+FirstName,
+MiddleName,
+LastName,
+Title
+from Person.Person
+WHERE Title = 'Mr.'
+ORDER BY LastName
+
+
 
 
