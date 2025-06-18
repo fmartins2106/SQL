@@ -1,0 +1,59 @@
+/* 
+ALL (SUBQUERY)
+AND
+OR
+SOME | ANY (SUBQUERY)
+BETWEEN
+EXISTS (SUBQUERY)
+IN | NOT IN
+LIKE | NOT LIKE
+ */
+
+ SELECT * FROM Person.Person 
+ where BusinessEntityID > 150
+ AND FirstName <> 'lane'
+ AND FirstName <> 'Aeron'
+ AND MiddleName <> 'G'
+ ORDER BY FirstName;
+
+
+ SELECT * FROM Person.Person 
+ where BusinessEntityID > 150
+ AND (FirstName <> 'Aaron' AND MiddleName <> 'G')
+ ORDER BY FirstName;
+
+
+SELECT * FROM Person.Person 
+where BusinessEntityID BETWEEN 600 AND 800
+
+
+SELECT * FROM Person.Person 
+WHERE BusinessEntityID IN (1,2,3,4,567,789,7655)
+
+SELECT * FROM Person.Person 
+WHERE FirstName NOT IN ('KEN', 'GIG','Aaron','A.')
+
+
+SELECT * FROM Person.Person
+WHERE FirstName LIKE 'g%' /* like com porcentagem, traz qualquer nome com a letra G */
+
+
+SELECT * FROM Person.Person
+WHERE FirstName LIKE 'g___' /* com underline tras a letra g mais 3 caracteres. */
+ORDER BY FirstName
+
+SELECT * FROM Person.Person
+WHERE FirstName LIKE 'G__a' /* Não faz destinção o que tem no meio, so traz os nomes que tem primeira letra G e ultima a */
+ORDER BY FirstName
+
+SELECT * FROM Person.Person 
+WHERE FirstName LIKE '___a'
+ORDER BY FirstName
+
+SELECT * FROM Person.Person 
+WHERE FirstName LIKE '[ABCDEFG]___a' /* Outra forma de fazer pesquisa por letra inicial dos nomes */
+ORDER BY FirstName
+
+SELECT * FROM Person.Person 
+WHERE FirstName LIKE '[^ABCDEFG]___a' 
+ORDER BY FirstName '  
