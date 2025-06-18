@@ -11,6 +11,9 @@ SELECT TOP 1000 *
 from Person.Person
 ORDER BY FirstName ASC;
 
+select top 1000 *
+from Person.Person;
+
 
 SELECT top 1000 * 
 from Person.Person 
@@ -107,8 +110,6 @@ Title
 from Person.Person
 WHERE Title = 'Mr.'
 ORDER BY LastName
-
-
 
 
 
