@@ -10,7 +10,6 @@
  SELECT * FROM Person.Person 
  WHERE FirstName = 'gigi';
 
- 
  SELECT * FROM Person.Person
  where FirstName <> 'gigi';
 
