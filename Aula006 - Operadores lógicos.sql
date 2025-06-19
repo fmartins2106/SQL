@@ -17,6 +17,27 @@ LIKE | NOT LIKE
  ORDER BY FirstName;
 
 
+SELECT * FROM Person.Person
+where Title = 'Mr.'
+AND FirstName <> 'lane'
+AND FirstName <> 'Aaron'
+AND MiddleName <> 'G'
+ORDER BY BusinessEntityID
+OFFSET 50 ROWS 
+FETCH NEXT 10 ROWS ONLY;
+
+select * from Person.Person 
+where Title = 'Mr.'
+AND FirstName IN ('ken','roberto')
+ORDER BY BusinessEntityID
+
+
+SELECT * FROM Person.Person
+where BusinessEntityID > 150
+AND (FirstName <> 'Aaron' AND MiddleName <> 'G')
+ORDER BY BusinessEntityID;
+
+
  SELECT * FROM Person.Person 
  where BusinessEntityID > 150
  AND (FirstName <> 'Aaron' AND MiddleName <> 'G')
@@ -56,4 +77,4 @@ ORDER BY FirstName
 
 SELECT * FROM Person.Person 
 WHERE FirstName LIKE '[^ABCDEFG]___a' 
-ORDER BY FirstName '  
+ORDER BY FirstName  

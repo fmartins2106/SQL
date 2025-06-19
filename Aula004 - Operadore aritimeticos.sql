@@ -36,5 +36,8 @@ SELECT '5' * '5' /* Vai dar erro */
 
 SELECT 'FERNANDO' +' '+ 'MARTINS' AS NOME /* Para contatenar, usa sinal de adição */
 
+SELECT 'Fernando' +' '+' Martins' as nome;
+ 
+ select 'Maria' as nome;
 
  
