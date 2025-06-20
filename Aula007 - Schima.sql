@@ -10,3 +10,7 @@ AND [TABLE_NAME] = 'Person'
 SELECT * FROM AdventureWorks2019.Sales.Store
 /* DBO SCHIMA PADRÃO */
 /* SELECT * from [Nome_Da_Base].[Nome_do_Schima].[Nome_Da_Tabela] */
+
+SELECT * FROM INFORMATION_SCHEMA.COLUMNS
+WHERE [TABLE_SCHEMA] = 'person'
+and [TABLE_NAME] = 'person'
