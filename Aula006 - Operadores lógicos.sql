@@ -135,3 +135,34 @@ LastName AS [Sobrenome]
 from person.person
 ORDER BY BusinessEntityID
 
+SELECT TOP 100
+BusinessEntityID,
+Title,
+FirstName,
+LastName
+FROM person.person
+WHERE Title = 'Mr.'
+ORDER BY BusinessEntityID
+
+SELECT DISTINCT 
+BusinessEntityID,
+FirstName,
+MiddleName,
+LastName
+from person.person
+ORDER by FirstName
+
+
+SELECT
+BusinessEntityID,
+FirstName,
+LastName,
+Title
+from person.Person
+ORDER BY BusinessEntityID
+OFFSET 40 Rows
+FETCH NEXT 200 ROWS ONLY
+
+
+
+
