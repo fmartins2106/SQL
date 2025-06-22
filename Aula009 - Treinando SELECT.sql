@@ -5,6 +5,39 @@ where funcionario_id in (13,2,3,4,5,6,7)
 order by funcionario_id;
 
 
+select * from empresa.funcionarios f 
+where funcionario_id in (2,3,44,55)
+
+
+select 
+funcionario_id,
+nome,
+sobrenome,
+email,
+salario
+from empresa.funcionarios
+where nome ilike '__a%'
+order by nome desc
+
+
+select * from information_schema.columns
+where table_schema = 'empresa'
+and table_name   = 'funcionarios'
+
+
+select 
+nome,
+sobrenome,
+salario,
+email 
+from empresa.funcionarios
+where (salario >= 3000 and salario <= 4000)
+order by salario desc
+
+
+
+
+
 select
 nome,
 sobrenome,
@@ -29,6 +62,33 @@ sobrenome,
 data_nascimento
 from empresa.funcionarios f 
 where (funcionario_id >= 40);
+
+
+select 
+f.nome,
+f.sobrenome,
+f.funcionario_id
+from empresa.funcionarios f 
+where   f.nome ilike 'Ricardo'
+order by f.funcionario_id  desc 
+offset 4
+limit 3
+
+
+select 
+nome,
+sobrenome,
+salario,
+cpf
+from empresa.funcionarios
+where nome ilike 'ricardo'
+and funcionario_id > 100
+order by sobrenome desc
+
+
+
+select * from empresa.funcionarios f 
+where f.nome ilike 'ricardo'
 
 
 select 
