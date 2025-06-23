@@ -91,6 +91,7 @@ select * from empresa.funcionarios f
 where f.nome ilike 'ricardo'
 
 
+
 select 
 funcionario_id,
 nome,

@@ -1,3 +1,5 @@
+-- ftrabalhando com funcoes de agregação
+
 SELECT
 PP.BusinessEntityID,
 Title,
@@ -24,3 +26,5 @@ inner join Person.EmailAddress as pea
 ON pp.BusinessEntityID = pea.BusinessEntityID
 inner join person.PersonPhone as app
 on pea.BusinessEntityID = app.BusinessEntityID
+
+
