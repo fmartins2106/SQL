@@ -9,6 +9,42 @@ select * from empresa.funcionarios f
 where funcionario_id in (2,3,44,55)
 
 
+select * from empresa.funcionarios f 
+limit 50
+
+
+select count(*)  
+from empresa.funcionarios f
+
+select count(*)
+from empresa.clientes c 
+
+
+select count (*)
+from empresa.emails e 
+
+
+select 
+c.cliente_id,
+c.data_cadastro,
+c.tipo_pessoa,
+c.email,
+c.endereco,
+c.nome,
+v.data_venda,
+v.forma_pagamento,
+v.total,
+v.venda_id,
+v.desconto
+from empresa.clientes c 
+inner join empresa.vendas v
+on v.cliente_id = c.cliente_id
+order by v.total desc
+
+select * from empresa.vendas v 
+
+select * from empresa.clientes c 
+
 select 
 funcionario_id,
 nome,
@@ -89,7 +125,6 @@ order by sobrenome desc
 
 select * from empresa.funcionarios f 
 where f.nome ilike 'ricardo'
-
 
 
 select 
