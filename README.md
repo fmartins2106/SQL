@@ -1,4 +1,4 @@
-# Estudos SQL Server
+# Estudos SQLserver e PostgreSQL
 
 Repositório com estudos de banco de dados SQL Server.
 
