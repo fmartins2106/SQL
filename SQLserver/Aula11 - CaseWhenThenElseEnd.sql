@@ -21,17 +21,36 @@ LoginID,
 OrganizationLevel,
 JobTitle,
 BirthDate,
-MaritalStatus,
-Gender,
+CASE MaritalStatus
+    WHEN 'S' THEN 'Solteiro'
+    WHEN 'm' THEN 'Casado'
+    Else 'Não localizado'
+END AS MaritalStatus,
+CASE Gender
+    WHEN 'M' THEN 'Masculino'
+    WHEN 'F' THEN 'Feminimo'
+END AS Gender,
 PersonType,
 NameStyle,
 Title,
 FirstName,
 MiddleName,
+CASE
+    WHEN (MiddleName = 'E' OR MiddleName = 'A') THEN 'VOGAIS'
+    WHEN (MiddleName = 'e' OR MiddleName = 'A') AND Title IS NOT NULL THEN 'VOGAIS_2'
+    ELSE 'TUDO JUNTO' 
+    END AS MiddleName_diferente,
 LastName,
+Rate,
+CASE 
+    WHEN Rate < 12.000 THEN (Rate * 3)
+    WHEN Rate BETWEEN 12.000 and 20.000 THEN Rate * 1.1
+    WHEN Rate > 20.000 THEN Rate * 0.1
+    ELSE 0
+END AS [Comparação Numeral],
 pea.EmailAddress,
 ppp.PhoneNumber,
-ppp.PhoneNumberTypeID
+ppp.PhoneNumberTypeID,
 FirstName+' '+MiddleName+' '+LastName as 'Nome completo'
 from person.person AS pp
 join person.EmailAddress as pea
