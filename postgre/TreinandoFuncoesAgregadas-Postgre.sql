@@ -2,8 +2,14 @@ select * from empresa.vendas
 limit 40;
 
 
+
+
+
+
 SELECT COUNT(*) AS TOTAL_VENDAS
 from empresa.vendas
+
+select COUNT(*) from empresa.funcionarios
 
 select * from empresa.vendas
 
@@ -64,6 +70,18 @@ select MIN(funcionario_id) as minimo,
         SUM(funcionario_id) as soma
 from empresa.funcionarios
 
+select MIN(funcionario_id) as minimo,
+        MAX(funcionario_id) as máximo,
+        AVG(funcionario_id) as média,
+        SUM(funcionario_id) as soma
+from empresa.funcionarios
+
+
+select * from empresa.funcionarios
+where data_nascimento BETWEEN '1986-01-01' and '1999-01-01'
+order by data_nascimento desc
+
+
 
 select *
 from empresa.funcionarios
@@ -74,6 +92,14 @@ select departamento_id,
     MAX(salario) AS MAIOR_SALARIO
 from empresa.funcionarios
 group by departamento_id
+
+
+select departamento_id,
+    MIN(salario) as MENOR_SALARIO,
+    MAX(salario) as MAIOR_SALARIO
+FROM empresa.funcionarios
+GROUP by departamento_id
+order by maior_salario
 
 
 select * from empresa.vendas
@@ -91,6 +117,37 @@ ON c.cliente_id = v.cliente_id
 where v.data_venda BETWEEN '2024-01-01' and '2025-06-01'
 GROUP BY v.cliente_id,c.nome
 ORDER by v.cliente_id
+
+
+select * from empresa.vendas
+limit 30
+
+select * from empresa.clientes
+limit 30
+
+SELECT
+c.cliente_id AS "Código do cliente",
+c.cnpj_cpf as "Número documento(CPF/CNPJ)",
+c.nome as "Nome do cliente",
+    SUM(v.total) as "Total das vendas",
+    AVG(V.total) as "Média de compra",
+    MIN(v.total) as "Menor compra do ano",
+    MAX(v.total) as "Maior compra do ano"
+from empresa.clientes c
+inner join empresa.vendas v
+on c.cliente_id = v.cliente_id
+where data_venda BETWEEN '2025-01-01' and '2025-12-31'
+GROUP by c.cliente_id,c.cnpj_cpf,c.nome
+order by "Total das vendas" desc
+
+
+select
+v.total
+from empresa.vendas v
+where v.cliente_id = 277 and v.data_venda BETWEEN '2025-01-01' and '2025-12-31'
+order by v.total desc
+
+
 
 select v.cliente_id,
     c.nome as NOME_CLIENTE,

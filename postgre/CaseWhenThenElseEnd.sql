@@ -58,15 +58,18 @@ and table_type = 'BASE TABLE'
 
 select table_name  as "Nome das tabelas"
 from information_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'empresa'
+AND TABLE_TYPE = 'BASE TABLE'
+
+select table_name  as "Nome das tabelas"
+from information_SCHEMA.TABLES
 where table_schema = 'empresa'
 and table_type = 'BASE TABLE'
-
 
 select table_name as "Nome das tabelas"
 from information_SCHEMA.TABLES
 where TABLE_schema = 'empresa'
 and TABLE_type = 'BASE TABLE'
-
 
 SELECT TABLE_NAME AS "Nome das tableas"
 from information_SCHEMA.TABLES
@@ -93,6 +96,20 @@ case
     end as "Código Funcionário"
 from empresa.vendas v
 order by "Código da venda";
+
+
+select 
+v.venda_id as "Código da venda",
+v.cliente_id as "Código do cliente",
+v.data_venda as "Data da venda",
+v.forma_pagamento as "Forma de pagamento",
+CASE
+    when v.funcionario_id is NULL then '-----'
+    end as "Código do funcionário"
+from empresa.vendas v
+order by "Código da venda"
+
+
 
 SELECT
 v.venda_id as "Código da venda",
