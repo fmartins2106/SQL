@@ -27,3 +27,5 @@ SELECT (SELECT CAST(GETDATE() AS varchar(25))) + '6565' /* CONVERTE DATA PARA TE
 SELECT TRY_CAST('6528.56' AS float)
 
 SELECT TRY_CAST('255' AS tinyint) /* Intervalo de dado pequeno 1byte */
+
+Aula14 - Funções de Data e Hora do Sistema.sql
