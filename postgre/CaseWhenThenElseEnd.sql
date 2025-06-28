@@ -187,3 +187,35 @@ INSERT INTO empresa.funcionarios (
 
 ALTER TABLE empresa.funcionarios
 ALTER COLUMN cpf TYPE VARCHAR(14);
+
+
+select * from empresa.vendas
+limit 40;
+
+select * from empresa.funcionarios
+limit 40
+
+SELECT * from empresa.clientes
+limit 30
+
+select * from empresa.departamentos
+limit 30
+
+
+select 
+f.nome || ' '|| f.sobrenome as "Nome Completo",
+f.data_nascimento,
+f.cpf,
+f.email,
+d.departamento_id,
+d.nome,
+CASE 
+    WHEN EXTRACT(YEAR from age(CURRENT_DATE, f.data_nascimento)) < 18 THEN 'Menor de idade'
+    else 'Maior de idade'
+    end as "Classificação"
+from empresa.funcionarios f
+inner join empresa.departamentos d
+on f.departamento_id = d.departamento_id
+order by d.nome 
+
+

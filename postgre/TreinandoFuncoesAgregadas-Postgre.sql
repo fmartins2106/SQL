@@ -167,3 +167,32 @@ order by total_vendas desc
 select * from empresa.vendas limit 30
 select * from empresa.clientes limit 30
 
+
+
+
+SELECT
+v.cliente_id as "Código do cliente",
+c.nome as "Nome do cliente",
+    SUM(v.total) as "Total de vendas em 2025",
+    AVG(v.total) as "Média das vendas em 2025",
+    MIN(v.total) as "Menor venda em 2025",
+    MAX(v.total) as "Maior venda em 2025",
+CASE 
+    when v.funcionario_id is NULL then '----'
+    else v.funcionario_id::TEXT
+    end as "Código do funcionário"
+from empresa.vendas v
+inner join empresa.clientes c
+on c.cliente_id = v.cliente_id
+where v.data_venda BETWEEN '20250101' and '20251231' 
+GROUP by v.cliente_id,c.nome,v.funcionario_id
+order by   v.cliente_id
+
+
+
+select * from empresa.clientes
+limit 20
+
+select *
+from empresa.vendas
+limit 30
