@@ -10,6 +10,12 @@ SELECT
     EXTRACT(minute from now()) as minuto,
     extract(second from now()) as segundos
 
+select
+    extract(year from now()),
+    EXTRACT(month from now()),
+    EXTRACT(day from now())
+
+
 
 SELECT
     EXTRACT(YEAR FROM NOW()) AS ANO,
@@ -53,6 +59,60 @@ SELECT
 
 
 SELECT
+    TO_CHAR(NOW(), 'MONTH') AS "MES"
+
+SELECT
+    TO_CHAR(NOW(), 'DAY') AS ANO
+    WHERE 'DAY' = 'TUESDAY' AS "Terça"
+
+SET lc_time = 'Portuguese_Brazil.1252';
+SELECT TO_CHAR(NOW(), 'FMDay') AS dia_em_portugues;
+
+SELECT 
+  CASE EXTRACT(DOW FROM NOW())
+    WHEN 0 THEN 'domingo'
+    WHEN 1 THEN 'segunda-feira'
+    WHEN 2 THEN 'terça-feira'
+    WHEN 3 THEN 'quarta-feira'
+    WHEN 4 THEN 'quinta-feira'
+    WHEN 5 THEN 'sexta-feira'
+    WHEN 6 THEN 'sábado'
+  END AS dia_em_portugues;
+
+
+SELECT
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'DOMINGO'
+        WHEN 1 THEN 'SEGUNDA-FEIRA'
+        WHEN 2 THEN 'TERÇA-FEIRA'
+        WHEN 3 THEN 'QUARTA-FEIRA'
+        WHEN 4 THEN 'QUINTA-FEIRA'
+        WHEN 5 THEN 'SEXTA-FEIRA'
+        WHEN 6 THEN 'SABÁDO'
+    END AS "Dia da semana"
+
+SELECT
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'DOMINGO'
+        WHEN 1 THEN 'SEGUNDA-FEIRA'
+        WHEN 2 THEN 'TERÇA-FEIRA'
+        WHEN 3 THEN 'QUARTA-FEIRA'    
+        WHEN 4 THEN 'QUINTA-FEIRA'
+        WHEN 5 THEN 'SEXTA-FEIRA'
+        WHEN 6 THEN 'SÁBADO'
+    END AS "Dia da semana"
+ 
+
+SELECT 
+    TO_CHAR(now(), 'MONTH') AS "Mês"
+        
+
+
+SELECT
+    TO_CHAR(NOW(), 'DAY') AS DIA
+
+
+SELECT
     TO_CHAR(NOW(),'MONTH') AS NOME_DO_MES
 
 SELECT
@@ -92,6 +152,19 @@ SELECT
     EXTRACT(YEAR FROM NOW()) AS ANO
 
 SELECT
+    extract(DAY FROM NOW()) AS DIA,
+    TO_CHAR(NOW(), 'MONTH') AS MES,
+    EXTRACT(YEAR FROM NOW()) AS ANO
+
+SELECT
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'DOMINGO'
+        WHEN 1 THEN 'SEGUNDA-FEIRA'
+        WHEN 2 THEN 'TERÇA-FEIRA'
+    END AS "Dia da semana"
+
+
+SELECT
     (NOW():: DATE - DATE '1985-06-21') "TOTAL DE DIAS"
 
 SELECT
@@ -100,15 +173,44 @@ SELECT
 SELECT
     (NOW():: DATE - DATE '2024-01-20') AS TOTAL_DIAS;
 
+select
+    (now():: date - date '2025-02-02') as T0TAL_DIAS
+
+
+SELECT
+    (now():: date - date '2021-01-02') as "TOTAL DE DIAS"
+
+SELECT
+    (NOW():: DATE - DATE '2021-01-02') AS "TOTAL DE DIAS"
+
+SELECT
+    (NOW():: DATE - DATE '2021-01-01') AS "TOTAL DE DIAS"
+
+
+SELECT
+    (NOW():: DATE - DATE '2020-10-10') AS "TOTAL DE DIAS"
+
+
+SELECT 
+    CASE extract(DOW FROM NOW())
+        WHEN 0 THEN 'DOMINGO'
+        WHEN 1 THEN 'SEGUNDA-FEIRA'
+        WHEN 2 THEN 'TERÇA-FEIRA'
+    END AS "Dia da semana"
+
+select
+    TO_CHAR(NOW(), 'MONTH') AS MES
+
+SELECT
+    (NOW():: DATE - DATE '2020-02-02') AS TOTAL_DIAS
+
+
 SELECT
     (NOW():: DATE - DATE '2024-10-10') AS TOTAL_DIAS;
 
 
 SELECT
     (NOW():: DATE - DATE '01-11-2024') AS TOTAL_DIAS;
-
-
-
 
 
 SELECT
@@ -134,6 +236,16 @@ SELECT
     (NOW():: date - data_nascimento::date) as dif_dias
 from empresa.funcionarios;
 
+
+SELECT
+nome || ' ' || sobrenome as "Nome Completo",
+    DATE_PART('YEAR',age(now(), data_nascimento)) as Idade
+from empresa.funcionarios
+
+
+select * from empresa.funcionarios limit 30
+
+
 SELECT
     cliente_id,
     data_venda,
@@ -141,6 +253,10 @@ SELECT
     DATE_PART('year',AGE(NOW(), data_venda)) as DIF_ANO,
     total
 from empresa.vendas;
+
+
+
+
 
 SELECT
     DATE_PART('YEAR',AGE(NOW(), '2024-01-01')) AS ANOS_TOTAIS
@@ -200,6 +316,22 @@ limit 3
 select TABLE_NAME AS "NOME DA TABELA"
 from information_SCHEMA.TABLES
 where table_schema = 'empresa'
+and table_type = 'BASE TABLE'
+
+
+select table_name as "nome da tabela"
+from information_schema.tables
+where table_schema = 'empresa'
+and table_type = 'BASE TABLE'
+
+SELECT TABLE_NAME AS "NOME DA TABLEA"
+FROM information_schema.tables
+where table_schema = 'empresa'
+and table_type = 'BASE TABLE'
+
+select TABLE_NAME AS "NOME DA TABELA"
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'empresa'
 and table_type = 'BASE TABLE'
 
 
@@ -270,11 +402,60 @@ SELECT
     INTERVAL '1 DAY' AS "ULTIMO DIA DO MES"
 
 SELECT
+    DATE_TRUNC('MONTH', DATE '2022-01-12') + INTERVAL '1 MONTH' -
+    INTERVAL '1 DAY' AS "ULTIMO DIA DO MES"
+
+SELECT
+    DATE_TRUNC('MONTH', DATE '2020-09-19') + INTERVAL '1 MONTH'
+    - INTERVAL '1 DAY' AS "último dia do mes"
+
+
+SELECT
+    DATE_PART('YEAR',AGE(NOW(), DATE '2020-02-02')) AS IDADE
+
+
+select
+    (now():: DATE - DATE '2021-01-19') as total_dias
+
+
+SELECT
+    TO_CHAR(NOW(),'DAY')
+
+SELECT
+    DATE_PART('YEAR',AGE(NOW(), DATE '2020-07-02')) AS IDADE,
+    DATE_PART('MONTH',AGE(NOW(), DATE '2020-07-02')) AS MES
+
+
+SELECT
+    DATE_PART('MONTH',AGE(NOW(), DATE '2020-02-02')) AS TOTAL_ANOS
+
+SELECT
+    TO_CHAR(NOW(), 'MONTH') AS MES
+
+
+SELECT
+    DATE_PART('YEAR',AGE(NOW(), '2022-01-02')) AS TOTA_ANOS
+
+SELECT
+    (NOW():: DATE - DATE '2023-02-01' ) AS TOTAL_DIAS
+
+SELECT
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'DOMINGO'
+        WHEN 1 THEN 'SEGUNDA'
+        WHEN 2 THEN 'TERÇA-FEIRA'
+    END AS "Dia da semana"
+
+
+
+SELECT
     DATE_TRUNC('MONTH', DATE '2024-02-02') + INTERVAL '1 MONTH' -
     INTERVAL '1 DAY' AS "último dia do mês"
 
 
-
+select
+    date_trunc('month', DATE '2022-02-20') + INTERVAL '1 MONTH' -
+    INTERVAL '1 DAY' AS "último dia do mês"
 
 SELECT DATE_TRUNC('MONTH', DATE '2024-02-20') + INTERVAL '1 MONTH' -
 INTERVAL '1 DAY' AS "Último dia do mês de vefereiro"
@@ -322,13 +503,9 @@ limit 30
 SELECT * FROM EMPRESA.CLIENTES
 LIMIT 30
 
-
 select * from empresa.fornecedores
 
-
-
 select * from empresa.funcionarios
-
 
 SELECT * from empresa.vendas
 limit 3
