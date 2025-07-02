@@ -266,6 +266,7 @@ SELECT
 SELECT
     (NOW():: DATE - DATE '1985-01-01') As total_dias;
 
+
 SELECT
 (NOW():: DATE - DATE '1986-01-01') AS TOTAL_DE_DIAS;
 
