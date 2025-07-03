@@ -13,6 +13,49 @@ SELECT
 TO_CHAR(NOW(), 'month') AS NOME_DO_MES;
 
 
+SELECT
+    CASE EXTRACT(DOW FROM NOW()) 
+        WHEN 0 THEN 'Domingo'
+        WHEN 1 THEN 'Segunda-feira'
+        WHEN 2 THEN 'Terça-feira'
+        WHEN 3 THEN 'Quarta-feira'
+        WHEN 4 THEN 'Quinta-feira'
+        WHEN 5 THEN 'Sexta-feira'
+        WHEN 6 THEN 'Sábado'
+    END AS "Dia da semana"
+
+
+SELECT * FROM NOW()
+
+
+SELECT(NOW():: DATE - DATE '2024-01-02') AS "Total de dias"
+
+select(now():: DATE - DATE '2020-01-01') AS "Total de dias"
+/* total de dias */
+
+
+SELECT EXTRACT(YEAR FROM NOW()) /* Data hoje. */
+
+
+SELECT /* mês descritivo */
+    TO_CHAR(NOW(), 'MONTH') AS "Mês"
+
+
+SELECT /* mês descritivo */
+    TO_CHAR(NOW(), 'MONTH') AS "MÊS"
+
+
+SELECT /* Calculando idade */
+    DATE_PART('YEAR',AGE(NOW(), '2020-01-02')) AS "IDADE"
+
+
+SELECT
+    DATE_TRUNC('MONTH', NOW()) + INTERVAL '1 MONTH' - INTERVAL
+    '1 DAY' AS "ÚLTIMO DIA DO MÊS"
+
+
+
+      DATE_TRUNC('MONTH', ModifiedDate) + INTERVAL '1 MONTH' - INTERVAL '1 day' AS ultimo_dia_do_mes,
 
 SELECT 
     (NOW()::date - DATE '1991-04-12') AS total_dias; /* Calculando total de dias */
@@ -61,7 +104,7 @@ SELECT
   DATE_TRUNC('MONTH', ModifiedDate - INTERVAL '3 MONTH') + INTERVAL '1 MONTH' - INTERVAL '1 day' AS menos_3_meses,
 
   -- Último dia do mês da data atual
-  DATE_TRUNC('MONTH', ModifiedDate) + INTERVAL '1 MONTH' - INTERVAL '1 day' AS ultimo_dia_do_mes,
+
 
   -- Último dia do mês 6 meses depois da data
   DATE_TRUNC('MONTH', ModifiedDate + INTERVAL '6 MONTH') + INTERVAL '1 MONTH' - INTERVAL '1 day' AS mais_6_meses
