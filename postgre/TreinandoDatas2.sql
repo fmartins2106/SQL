@@ -448,11 +448,88 @@ on c.fornecedor_id = f.fornecedor_id
 GROUP by c.fornecedor_id,f.nome,c.data_compra
 order by f.nome;
 
+select
+    c.fornecedor_id,
+    f.nome,
+    c.data_compra,
+    DATE_PART('YEAR',age(NOW(), c.data_compra)) as "Diferença última compra(anos)",
+    DATE_PART('MONTH',age(NOW(), c.data_compra)) as "Diferenca última compra(mês)"
+from empresa.compras c
+inner join empresa.fornecedores f
+on c.fornecedor_id = f.fornecedor_id
+group by f.nome,c.data_compra,c.fornecedor_id
+order by f.nome
+
+
+select
+    c.fornecedor_id,
+    f.nome,
+    DATE_PART('YEAR',AGE(NOW(), c.data_compra)) as "Diferença última compra(anos)",
+    DATE_PART('MONTH', AGE(NOW(), c.data_compra)) as "Difirença última compra(meses)"
+from empresa.compras c
+inner join empresa.fornecedores f
+on c.fornecedor_id = f.fornecedor_id
+order by c.fornecedor_id
+
+
+
 
 SELECT
     nome || ' ' || sobrenome,
     DATE_PART('YEAR',age(now(), data_nascimento)) as "Idade"
 from empresa.funcionarios
+
+
+
+select
+    nome || ' ' || sobrenome,
+    DATE_PART('YEAR',AGE(NOW(), data_nascimento)) as "Idade"
+from empresa.funcionarios
+
+select
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'Doming'
+        WHEN 1 THEN 'Segunda-feira'
+        WHEN 2 THEN 'Terça-feira'
+        WHEN 3 THEN 'Quarta-feira'
+        WHEN 4 THEN 'Quinta-feira'
+        WHEN 5 THEN 'Sexta-feira'
+        WHEN 6 THEN 'Sábado'
+    end as "Dia da semana"
+
+
+SELECT 
+    nome || ' ' || sobrenome,
+    DATE_PART('YEAR',AGE(NOW(), data_nascimento)) as IDADE
+from empresa.funcionarios
+
+
+SELECT
+    (NOW():: DATE - DATE '2020-02-23') "total de dias"
+
+
+SELECT * FROM empresa.clientes limit 2
+
+SELECT
+    cliente_id,
+    nome,
+    tipo_pessoa,
+    DATE_PART('YEAR',AGE(NOW(), data_cadastro)) as "Anos de cadastro",
+    DATE_PART('MONTH',AGE(NOW(), data_cadastro)) as "Meses de cadastro",
+    (NOW():: DATE - data_cadastro) as "Total de dias desde o cadastro"
+from empresa.clientes
+
+
+
+select * from empresa.vendas limit 3
+
+
+
+select
+    nome || ' ' || sobrenome,
+    DATE_PART('YEAR', AGE(NOW(), data_nascimento)) as Idade
+from empresa.funcionarios
+
 
 SELECT * FROM empresa.funcionarios
 limit 20
@@ -532,6 +609,14 @@ SELECT
     DATE_PART('YEAR',AGE(NOW(), DATE '2020-07-02')) AS IDADE,
     DATE_PART('MONTH',AGE(NOW(), DATE '2020-07-02')) AS MES
 
+
+SELECT 
+    nome || ' '|| sobrenome,
+    DATE_PART('YEAR',AGE(NOW(), data_nascimento::DATE)) as "Idade"
+from empresa.clientes 
+
+
+select * from empresa.funcionarios limit 20
 
 SELECT
     DATE_PART('MONTH',AGE(NOW(), DATE '2020-02-02')) AS TOTAL_ANOS
@@ -616,3 +701,32 @@ select * from empresa.funcionarios
 
 SELECT * from empresa.vendas
 limit 3
+
+
+select * from empresa.vendas limit 2
+
+
+select * from empresa.clientes limit 3
+
+
+
+SELECT
+    v.venda_id,
+    v.cliente_id,
+    CASE
+        WHEN v.funcionario_id is null then
+         'Não informado'
+    end as "Código funcionário",
+    c.nome,
+    c.tipo_pessoa,
+    v.data_venda,
+    (CURRENT_DATE - v.data_venda) as "Total de dias da compra"
+from empresa.vendas v
+inner join empresa.clientes c
+on c.cliente_id = v.cliente_id
+order by v.data_venda desc
+
+SELECT *
+from empresa.funcionarios limit 4
+
+
