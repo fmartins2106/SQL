@@ -730,3 +730,31 @@ SELECT *
 from empresa.funcionarios limit 4
 
 
+SELECT
+    CASE EXTRACT(DOW FROM NOW())
+        WHEN 0 THEN 'Domingo'
+        WHEN 1 THEN 'Segunda-Feira'
+        WHEN 2 THEN 'Terça-Feira'
+        WHEN 3 THEN 'Quarta-Feira'
+        WHEN 4 THEN 'Quinta-Feira'
+        WHEN 5 THEN 'Sexta-Feira'
+        WHEN 6 THEN 'Sábado'
+    end as "Dia da semana";
+
+
+select
+    funcionario_id,
+    nome || ' ' || sobrenome,
+    data_nascimento,
+    DATE_PART('YEAR',AGE(NOW(), data_nascimento)) as "Idade",
+    (now():: DATE - data_nascimento) as "Total de dias desde o nascimento",
+    CONCAT_WS(' | ',email, telefone) as "Dados para contato"
+from empresa.funcionarios f
+order by nome desc
+
+
+
+
+
+
+select * from empresa.funcionarios limit 3
