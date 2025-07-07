@@ -53,3 +53,6 @@ from empresa.funcionarios
 
 
 SELECT * FROM empresa.funcionarios limit 2
+
+
+

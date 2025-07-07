@@ -27,3 +27,24 @@ SELECT
 from person.Person PP
 JOIN person.EmailAddress as PEA
     ON PP.BusinessEntityID = PEA.BusinessEntityID
+
+
+SELECT
+    SalesOrderDetailID,
+    CarrierTrackingNumber,
+    SSOD.ProductID,
+    ProductNumber,
+    PP.Name,
+    REPLACE(PP.Name,'-',' - ') AS [REPLACE],
+    PATINDEX(' %[0-9A-z]-[0-9A-z]%',PP.Name) AS POSIÇÃO,
+    CASE
+        WHEN PATINDEX(' %[0-9A-z]-[0-9A-z]%',PP.Name) > 0  THEN STUFF(PP.Name,(PATINDEX('%[0-9A-z]-[0-9A-z]%',PP.Name)+1), 1, ' - ')
+        else PP.Name
+    end as [STUFF_2],
+    UnitPrice,
+    LineTotal,
+    SSOD.ModifiedDate
+from sales.SalesOrderDetail as SSOD
+LEFT JOIN Production.Product as PP
+ON SSOD.ProductID = PP.ProductID
+ORDER BY SalesOrderDetailID
