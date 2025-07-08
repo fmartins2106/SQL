@@ -52,7 +52,53 @@ SELECT
 from empresa.funcionarios
 
 
+
+select 
+    nome,
+    sobrenome,
+    email,
+    length("email") "quantidade de caracteres do email",
+    POSITION('@' IN "email") as "Posição do @",
+    LEFT("email",POSITION('@' IN "email")-1) as UserName,
+    RIGHT("email",LENGTH("email") - POSITION('@' IN "email")) as dominio
+from empresa.funcionarios
+
 SELECT * FROM empresa.funcionarios limit 2
+
+
+
+SELECT
+    extract(YEAR FROM CURRENT_DATE)
+
+SELECT
+    CURRENT_DATE
+
+
+SELECT
+    CASE extract(DOW FROM NOW())
+        WHEN 0 THEN 'Domingo'        
+        WHEN 1 THEN 'Segunda-Feira'
+        WHEN 2 THEN 'Terça-Feira'
+        WHEN 3 THEN 'Quarta-Feira'
+        WHEN 4 THEN 'Quinta-Feira'
+        WHEN 5 THEN 'Sexta-Feira'
+        WHEN 6 THEN 'Sábado'
+    END AS "Dia da semama"
+
+
+SELECT
+    nome || ' ' || sobrenome,
+    data_nascimento,
+    DATE_PART('YEAR', AGE(NOW(), data_nascimento)) as "Idade",
+    (NOW():: DATE - data_nascimento) as "Total de dias desde o nascimento.",
+    email,
+    POSITION('@' IN "email") as "Posição do @",
+    LEFT("email",POSITION('@' IN "email")-1) as UserName,
+    RIGHT("email",LENGTH("email") - POSITION('@' in "email")) as Dominimo
+
+from empresa.funcionarios
+
+select * from empresa.funcionarios limit 3
 
 
 
