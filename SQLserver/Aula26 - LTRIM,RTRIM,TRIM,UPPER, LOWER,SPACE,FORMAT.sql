@@ -11,8 +11,7 @@ SELECT
 
 SELECT
     CONCAT_WS(SPACE(1), 'extração de relatório', TRY_CONVERT(varchar(10),GETDATE(),108),TRY_CONVERT(varchar(10),GETDATE(),103)) as [DR EXTRACAO],
-    PP.BusinessEntityID,
-    UPPER(FirstName) as FirstName,
+    PP.BusinessEntityID,   UPPER(FirstName) as FirstName,
     LOWER(MiddleName) as MiddleName,
     LastName,
     EmailAddress,

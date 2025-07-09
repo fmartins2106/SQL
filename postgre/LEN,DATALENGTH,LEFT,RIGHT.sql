@@ -52,16 +52,61 @@ SELECT
 from empresa.funcionarios
 
 
+select
+    nome || ' ' || sobrenome as "Nome completo",
+    email,
+    POSITION('@' in "email") as "Posição do @",
+    LEFT("email",POSITION('@' in "email")-1) as "UserName",
+    RIGHT("email",LENGTH("email") - POSITION('@' in "email")) as "Dominio"
+from empresa.funcionarios
+
 
 select 
     nome,
     sobrenome,
     email,
+    data_nascimento,
+    DATE_PART('YEAR',age(now(), data_nascimento)) as "Idade",
     length("email") "quantidade de caracteres do email",
     POSITION('@' IN "email") as "Posição do @",
     LEFT("email",POSITION('@' IN "email")-1) as UserName,
     RIGHT("email",LENGTH("email") - POSITION('@' IN "email")) as dominio
 from empresa.funcionarios
+
+
+SELECT * FROM CURRENT_dATE
+
+SELECT * FROM NOW()
+
+
+
+SELECT 
+    CASE
+    EXTRACT (DOW FROM NOW())     
+        WHEN 2 THEN 'Quarta-feira'
+    END AS "Dia da semana"
+
+SELECT
+    CASE extract(DOW FROM NOW())
+        WHEN 0 THEN 'Domingo'
+        WHEN 1 THEN 'Segunda-Feira'
+        WHEN 2 THEN 'Terça-Feira'
+        WHEN 3 THEN 'Quarta-Feira'
+        WHEN 4 THEN 'Quinta-Feira'
+        WHEN 5 THEN 'Sexta-Feira'
+        WHEN 6 THEN 'Sábado'
+    end as "Dia da semana"
+
+
+select * from empresa.clientes limit 32
+
+SELECT
+    nome,
+    TRIM(REPLACE(endereco,',',' - ')) as Endereço,
+    TRIM(REPLACE(telefone,')',') ')) as Telefone,
+    REPLACE(TO_CHAR(data_cadastro,'dd-MM-yyyy'),'-','/') as data_cadastro
+from empresa.clientes
+
 
 SELECT * FROM empresa.funcionarios limit 2
 
