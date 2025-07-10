@@ -1,12 +1,9 @@
-
-
-
 SELECT
     LTRIM('                        DevDjo é o melhor                                   '),
     RTRIM('                        DevDjo é o melhor                                   '),
     TRIM('                        DevDjo é o melhor                                   '),
     UPPER('                        DevDjo é o melhor                                   '),
-    LOWER('                        DevDjo é o MELHOR                                   ')
+   LOWER('                        DevDjo é o MELHOR                                   ')
 
 
 SELECT
