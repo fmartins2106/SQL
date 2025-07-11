@@ -141,9 +141,43 @@ SELECT
     LEFT("email",POSITION('@' IN "email")-1) as UserName,
     RIGHT("email",LENGTH("email") - POSITION('@' in "email")) as Dominimo
 
-from empresa.funcionarios
+
+SELECT
+    nome || ' ' || sobrenome,
+    REPLACE(to_char(data_nascimento,'dd/MM/yyyy'),'-','/') as "Data de nascimento",
+    DATE_PART('YEAR', AGE(NOW(), data_nascimento)) as "Idade",
+    REPLACE(TO_CHAR(data_admissao,'dd/MM/yyyy'),'-',' / ') as "Data de adimissão",
+    (NOW()::DATE - data_admissao) as "Total de dias desde a admissão",
+    email,
+    POSITION('@' IN email) as "Posição do @",
+    LEFT("email",POSITION('@' in "email")-1) as "Nome_Usuario",
+    RIGHT("email", LENGTH("email") - POSITION('@' IN "email")) as "dominio",
+    CONCAT_WS(' | ', email, LEFT("email",POSITION('@' in "email")-1), RIGHT("email", LENGTH("email") - POSITION('@' IN "email"))) as "Informações do email"
+from empresa.funcionarios 
+
+
+SELECT * FROM empresa.funcionarios limit 3
+
 
 select * from empresa.funcionarios limit 3
+
+SELECT table_name as "Nome das talelas"
+FROM information_schema.tables 
+where TABLE_SCHEMA = 'empresa'
+and table_type = 'BASE TABLE'
+
+
+SELECT table_name as "Nome das tabelas"
+FROM information_Schema.tables
+where TABLE_SCHEMA = 'empresa'
+and table_type = 'BASE TABLE';
+
+
+SELECT TABLE_NAME AS "Nome da tabela"
+from information_schema.tables
+where table_schema = 'empresa'
+and table_type = 'BASE TABLE'
+
 
 
 
