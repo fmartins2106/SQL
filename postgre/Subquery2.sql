@@ -15,6 +15,41 @@ SELECT
 FROM empresa.funcionarios
 WHERE data_nascimento = (SELECT MAX(data_nascimento) from empresa.funcionarios)
 
+SELECT TABLE_NAME AS "Nome das tabelas"
+from information_schema.tables
+where TABLE_SCHEMA = 'empresa'
+and TABLE_TYPE = 'BASE TABLE'
+
+
+select * from empresa.produtos limit 100
+
+select * from empresa.fornecedores limit 20
+
+SELECT
+    produto_id,
+    nome_produto,
+    fornecedor_id,
+    nome_fornecedor
+    FROM(
+        SELECT
+            p.produto_id,
+            p.nome AS nome_produto,
+            p.descricao,
+            p.categoria,
+            p.preco,
+            p.estoque,
+            f.fornecedor_id,
+            f.nome AS nome_fornecedor
+        FROM empresa.produtos p
+        inner join empresa.fornecedores f
+            ON p.fornecedor_id = f.fornecedor_id
+        order by f.nome desc
+    ) AS "Table de produtos"
+
+
+from empresa.funcionarios
+
+
 UNION ALL
 
 SELECT
@@ -47,6 +82,68 @@ select
 from empresa.clientes
 WHERE data_cadastro = (SELECT max(data_cadastro) from empresa.clientes)
 
+
+SELECT
+    nome,
+    tipo_pessoa,
+    cnpj_cpf,
+    cidade,
+    data_cadastro
+from empresa.clientes
+where data_cadastro = (SELECT min(data_cadastro) from empresa.clientes)
+
+UNION all
+
+SELECT
+    nome,
+    tipo_pessoa,
+    cnpj_cpf,
+    cidade,
+    data_cadastro
+from empresa.clientes
+where data_cadastro = (SELECT max(data_cadastro) from empresa.clientes);
+
+
+SELECT TABLE_NAME AS "NOME DA TABELA"
+FROM INFORMATION_SCHEMA.tables
+WHERE TABLE_SCHEMA = 'empresa'
+AND TABLE_TYPE = 'BASE TABLE'
+
+SELECT * from empresa.funcionarios limit 2
+
+SELECT
+    nome || ' ' || sobrenome as "Nome completo",
+    cpf,
+    email,
+    LEFT("email",POSITION('@' IN "email") - length("email")-1) as UserName,
+    RIGHT("email",LENGTH("email") - POSITION('@' IN "email")),
+    REPLACE(TO_CHAR(data_nascimento,'dd/MM/yyyy'),'-','/') as "Data nascimento",
+    DATE_PART('YEAR',AGE(NOW(),data_nascimento))  as "IDADE",
+    (NOW()::DATE - data_nascimento) as "Total de dias desde a data de nascimento",
+    data_admissao,
+    CONCAT_WS(' | ', 
+    CAST(DATE_PART('YEAR',AGE(NOW(), data_admissao))AS INT ) || 'ANOS',
+    CAST(DATE_PART('MONTH',AGE(NOW(),data_admissao)) AS INT ) || 'MESES') as "Total tempo de casa"
+FROM empresa.funcionarios
+WHERE data_nascimento = (SELECT max(data_nascimento) FROM empresa.funcionarios )
+
+
+UNION ALL
+
+SELECT
+    nome || ' '|| sobrenome,
+    cpf,
+    email,
+    LEFT("email",POSITION('@' IN "email")-1) AS UserName,
+    RIGHT("email",LENGTH("email") - POSITION('@' IN "email")) as "Dominio",
+    REPLACE(TO_CHAR(data_nascimento,'dd/MM/yyyy'),'-','/') as "Data nascimento",
+    DATE_PART('YEAR',AGE(NOW(), data_nascimento)) as "IDADE",
+    (NOW()::DATE - data_nascimento) as "Total de dias desde a data de nascimento",
+    data_admissao,
+    CONCAT_WS(' | ',CAST(DATE_PART('YEAR',AGE(NOW(),data_admissao)) as INT) || 'ANOS' ,
+                    CAST(DATE_PART('MONTH',AGE(NOW(),data_admissao))as INT) || 'MESES' )
+FROM empresa.funcionarios
+WHERE data_nascimento = (SELECT min(data_nascimento) from empresa.funcionarios)
 
 
 select* from empresa.funcionarios
@@ -113,22 +210,24 @@ FROM Person.Person PP
 JOIN HumanResources.Employee AS HRE 
   ON PP.BusinessEntityID = HRE.BusinessEntityID;
 
-UPDATE empresa.compras
+UPDATE empresa.produtos
 SET fornecedor_id = 512
-WHERE compra_id = 1;
+WHERE produto_id = 18;
 
-UPDATE empresa.compras
+UPDATE empresa.produtos
 SET fornecedor_id = 513
-WHERE compra_id = 2;
+WHERE produto_id = 2;
 
-UPDATE empresa.compras
-SET fornecedor_id = 524
-WHERE compra_id = 3;
-
-UPDATE empresa.compras
+UPDATE empresa.produtos
 SET fornecedor_id = 515
-WHERE compra_id = 4;
+WHERE produto_id = 114;
 
-UPDATE empresa.compras
+UPDATE empresa.produtos
+SET fornecedor_id = 515
+WHERE produto_id = 103;
+
+select * from empresa.produtos order by fornecedor_id
+
+UPDATE empresa.produtos
 SET fornecedor_id = 516
-WHERE compra_id = 5;
+WHERE produto_id = 201;
