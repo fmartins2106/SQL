@@ -231,3 +231,104 @@ select * from empresa.produtos order by fornecedor_id
 UPDATE empresa.produtos
 SET fornecedor_id = 516
 WHERE produto_id = 201;
+
+
+SELECT TABLE_NAME AS "NOME DAS TABELAS"
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_SCHEMA = 'empresa'
+AND TABLE_TYPE = 'BASE TABLE'
+
+
+SELECT * FROM empresa.itens_venda limit 3
+
+
+SELECT * FROM empresa.estoque limit 4
+
+select * from empresa.produtos limit 4
+
+
+SELECT
+    e.estoque_id as "Código do estoque",
+    p.nome as "Nome do produto",
+    p.descricao as "Descrição do produto",
+    REPLACE(TO_CHAR(data_entrada, 'dd/MM/yyyy'),'-','/') as "Data da entrada",
+    REPLACE(TO_CHAR(data_saida,'dd/MM/yyyy'),'-','/')  as "Data da saida",
+    (data_saida -  data_entrada) as "Total de dias em estoque",
+    e.localizacao as "Localização",
+    e.lote,
+    REPLACE(TO_CHAR(e.validade,'dd/MM/yyyy'),'-','/') as "Validade",
+    (e.validade::DATE - CURRENT_DATE) as "Tempo disponiveil de validade",
+    e.fornecedor_id,
+    f.nome as "Nome do fornecedor",
+    e.custo_unitario
+FROM empresa.estoque e
+inner join empresa.fornecedores f
+    on e.fornecedor_id = f.fornecedor_id
+inner join empresa.produtos p
+    on p.produto_id  = e.produto_id
+WHERE validade = (SELECT MAX(validade) from empresa.estoque)
+
+UNION ALL
+
+SELECT
+    e.estoque_id as "Código do estoque",
+    p.nome as "Nome do produto",
+    p.descricao as "Descrição do produto",
+    REPLACE(TO_CHAR(data_entrada, 'dd/MM/yyyy'),'-','/') as "Data da entrada",
+    REPLACE(TO_CHAR(data_saida,'dd/MM/yyyy'),'-','/')  as "Data da saida",
+    (data_saida -  data_entrada) as "Total de dias em estoque",
+    e.localizacao as "Localização",
+    e.lote,
+    REPLACE(TO_CHAR(e.validade,'dd/MM/yyyy'),'-','/') as "Validade",
+    (e.validade::DATE - CURRENT_DATE) as "Tempo disponiveil de validade",
+    e.fornecedor_id,
+    f.nome as "Nome do fornecedor",
+    e.custo_unitario
+FROM empresa.estoque e
+inner join empresa.fornecedores f
+    on e.fornecedor_id = f.fornecedor_id
+inner join empresa.produtos p
+    on p.produto_id  = e.produto_id
+WHERE validade = (SELECT MIN(validade) from empresa.estoque)
+
+
+
+SELECT
+    estoque_vendido."Código do estoque",
+    estoque_vendido."Data da entrada",
+    estoque_vendido."Data da saida",
+    estoque_vendido."Validade",
+    estoque_vendido."Tempo disponivel de validade"
+    FROM(
+        SELECT
+    e.estoque_id as "Código do estoque",
+    p.nome as "Nome do produto",
+    p.descricao as "Descrição do produto",
+    REPLACE(TO_CHAR(data_entrada, 'dd/MM/yyyy'),'-','/') as "Data da entrada",
+    REPLACE(TO_CHAR(data_saida,'dd/MM/yyyy'),'-','/')  as "Data da saida",
+    (data_saida -  data_entrada) as "Total de dias em estoque",
+    e.localizacao as "Localização",
+    e.lote,
+    REPLACE(TO_CHAR(e.validade,'dd/MM/yyyy'),'-','/') as "Validade",
+    (e.validade::DATE - CURRENT_DATE) as "Tempo disponivel de validade",
+    e.fornecedor_id,
+    f.nome as "Nome do fornecedor",
+    e.custo_unitario
+FROM empresa.estoque e
+inner join empresa.fornecedores f
+    on e.fornecedor_id = f.fornecedor_id
+inner join empresa.produtos p
+    on p.produto_id  = e.produto_id
+) AS "estoque_vendido"
+
+
+
+
+
+
+WHERE data_cadastro = (SELECT max(data_cadastro) from empresa.clientes)
+
+select * from empresa.fornecedores
+
+select * from empresa.vendas
+limit 3
