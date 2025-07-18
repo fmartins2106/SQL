@@ -122,7 +122,7 @@ FROM
     information_schema.TABLES
 WHERE
     TABLE_TYPE = 'BASE TABLE'
-    AND table_schema not in ('pg_catalog',information_schema)
+    AND table_schema not in ('pg_catalog','information_schema')
 ORDER BY
     table_schema,table_name;
 
@@ -133,7 +133,7 @@ FROM
     information_schema.TABLES
 WHERE 
     TABLE_TYPE = 'BASE TABLE'
-    AND TABLE_SCHEMA NOT IN ('pg_catalog',information_schema)
+    AND TABLE_SCHEMA NOT IN ('pg_catalog','information_schema')
 ORDER BY 
     table_schema,table_name;
 
@@ -144,9 +144,74 @@ FROM
     information_schema.tables
 WHERE
     TABLE_TYPE = 'BASE TABLE'
-    AND TABLE_SCHEMA NOT IN ('pg_catalog',information_SCHEMA)
-ORDER BY table_schama,table_name
+    AND TABLE_SCHEMA NOT IN ('pg_catalog','information_schema')
+ORDER BY table_schEma,table_name
 
+
+SELECT
+    table_schema as "Nome da schema",
+    table_name as "Nome da tabela"
+FROM
+    information_schema.tables
+WHERE
+    TABLE_TYPE = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog','information_schema')
+ORDER BY 
+    TABLE_SCHEMA,TABLE_NAME;
+
+SELECT
+    table_schema as "Nome da tabela",
+    table_name as "Nome da tabela"
+FROM
+    information_schema.tables
+WHERE
+    TABLE_TYPES = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog','information_schema')
+ORDER BY
+    table_schema,table_name;
+
+SELECT
+    table_schema as "Nome da schema",
+    table_name as "Nome da tabela"
+FROM 
+    information_schema.tables
+WHERE 
+    TABLE_TYPE = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog','information_schema')
+ORDER BY
+    table_schema, table_name;
+
+
+SELECT
+    table_schema as "Nome da schema",
+    table_name as "Nome da tabela"
+FROM INFORMATION_SCHEMA.TABLES
+WHERE TABLE_TYPE = 'BASE TABLE'
+AND TABLE_SCHEMA NOT IN ('pg_catalog','information_schema')
+ORDER BY
+    table_schema,table_name;
+
+SELECT
+    table_schema as "table schema",
+    table_name as "nome da tabela"
+FROM information_schema.tables
+WHERE TABLE_TYPE = 'BASE TABLE'
+AND TABLE_SCHEMA NOT IN ('pg_catalog','information_schema')
+ORDER BY
+table_schema,table_name
+
+
+
+SELECT 
+    table_schema AS "Schema",
+    table_name AS "Nome da Tabela"
+FROM 
+    information_schema.tables
+WHERE 
+    table_type = 'BASE TABLE'
+    AND table_schema NOT IN ('pg_catalog', 'information_schema') -- ignora schemas internos
+ORDER BY 
+    table_schema, table_name;
 
 CREATE DATABASE "dbDataBase"
     LC_COLLATE = 'C'
@@ -245,6 +310,11 @@ CREATE TABLE professor.disciplinas(
 );
 CREATE SCHEMA IF NOT EXISTS professor;
 
+CREATE SCHEMA IF NOT EXISTS servidor
+
+CREATE SCHEMA IF NOT EXISTS fornecedor
+
+
 ALTER TABLE aluno.notas DROP COLUMN notas
 ALTER TABLE nome_da_tabela ADD COLUMN notas
 ALTER TABLE aluno.notas ADD COLUMN nota NUMERIC(5,2)
@@ -260,6 +330,10 @@ ALTER TABLE aluno.notas ADD COLUMN notas
 ALTER TABLE aluno.notas ADD COLUMN notas
 ALTER TABLE aluno.notas ADD COLUMN notas
 ALTER TABLE aluno.notas ADD COLUMN notas
+
+ALTER TABLE aluno.notas add COLUMN notas NUMERIC(5,2);
+
+ALTER TABLE aluno.notas DROP COLUMN nota
 
 
 CREATE TABLE aluno.notas
@@ -292,4 +366,55 @@ CREATE TABLE pedidos(
     CPF VARCHAR(14),
 CONSTRAINT FK_pedidos FOREIGN KEY (id_produto) REFERENCES empresa.vendas(id);
 );
+
+/* criando banco de dados padrão Postgre */
+CREATE DATABASE "dbEmpresa"
+    LC_COLLATE = 'C'
+    LC_CTYPE = 'C'
+    TEMPLATE = template0
+    ENCODING = 'UTF-0'
+
+/* Verificando tabela disponiveis no posgree */
+
+SELECT datname from pg_database
+
+
+CREATE TABLE pessoa.pessoas (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(100) NOT NULL,
+    sobrenome VARCHAR(100) NOT NULL,
+    data_nascimento DATE,
+    CPF VARCHAR(14)
+);
+
+
+CREATE TABLE pessoa.alunos(
+    id SERIAL PRIMARY KEY,
+    id_pessoa int NOT NULL,
+    id_turma int not null,
+    id_notas int not null,
+CONSTRAINT FK_pessoa FOREIGN KEY (id_pessoa) REFERENCES pessoa.pessoas(id),
+CONSTRAINT FK_pessoa FOREIGN KEY (id_turma) REFERENCES escola.turmas(id)
+);
+
+CREATE TABLE escola.turmas(
+    id SERIAL PRIMARY KEY,
+    periodo int not null,
+    nome VARCHAR(50) not null
+);
+
+CREATE SCHEMA IF NOT EXISTS escola
+
+select * from aluno.alunos limit 3
+
+
+ALTER TABLE aluno.alunos 
+ADD COLUMN turma_id int not null,
+ADD CONSTRAINT FK_turma_aluno 
+FOREIGN KEY (turma_id) REFERENCES escola.turmas(id);
+
+
+
+
+
 
