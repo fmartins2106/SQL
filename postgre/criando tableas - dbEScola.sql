@@ -306,11 +306,17 @@ alter table aluno.alunos add column asss int
 alter table aluno.alunos drop column asss
 
 
+-Deletar todaslinhas da tabela(mas não deleta a tabela)-
+truncate table Desenhos
 
 
+-deletar uma linha inteira-
+DELETE FROM Desenho WHERE id_desenhos = 3;
 
 
-
+-deletar tabela-
+DROP TABLE IF EXISTS pessoa.pessoa;
+                                   
 
 
 
