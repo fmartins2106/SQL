@@ -105,7 +105,6 @@ and TABLE_SCHEMA not in ('pg_catalog','information_schema')
 order by table_schema, table_name
 
 
-
 select * from professor.professores limit 5
 
 update professor.professores
@@ -113,7 +112,7 @@ set data_nascimento = '1999-03-12'
 where nome = 'Carlos'
 and cpf = '123.456.789-00'
 
-
+                                                                                 
 select * from aluno.alunos limit 10
 
 update aluno.alunos
@@ -168,10 +167,13 @@ create table endereco.cidades(
 	uf varchar(2) not null
 );
 
-
-
-
-
+insert into endereco.cidades(nome,uf) 
+values
+	('Curitiba','PR'),
+	('Cascavel','PR'),
+	('Pato Braco','PR');
+	
+select * from endereco.cidades limit 10
 
 
 
@@ -314,9 +316,78 @@ truncate table Desenhos
 DELETE FROM Desenho WHERE id_desenhos = 3;
 
 
+delete from aluno.alunos where id_pessoa = 5
+and nome = 'maria'
+
+update from aluno.alunos
+set nome = 'Maria'
+where id = 3
+
+update aluno.alunos 
+set data_nascimento = '2020-02-02'
+where nome = 'Maria'
+
+update aluno.alunos 
+set CPF = '323.334.223-33'
+where Nome = 'maria ' and id = 5
+
+
+
+create schema if not exists comida
+create schema if not exists alimento
+create schema if not exists comida
+
+
+select datname from pg_database
+select datname from pg_database
+select datname from pg_database
+select datname from pg_database
+select datname from pg_database
+select datname from pg_database
+
+
+select
+	table_schema as "Nome da schema",
+	table_name as "Nome da table"
+from 
+	information_schema.tables 
+WHERE
+	table_TYPE = 'BASE TABLE'
+and
+	TABLE_SCHEMA Not in ('pg_catalog','information_schema')
+order by
+	table_schema,table_name
+
+alter table aluno.alunos add column merenda varchar(19);
+
+alter table aluno.alunos drop column merenda;
+
+create table aluno.alunos(
+	id SERIAL primary key,
+	nome varchar(100) not null,
+	sobrenome varchar(200) not null,
+	data_nascimento DATE,
+	CPF VARCHAR(14),
+	id_turma int not null,
+constraint FK_id_turma foreign key (id_turma) references aluno.alunos(id)	
+);
+
+drop table if exists pessoa.pessoa;
+drop table if exists pessoa.pessoa;
+drop table if exists pessoa.pessoa;
+drop table if exists pessoa.pessoa;
+drop table if exists pessoa.pessoa;
+
+select datname from pg_database;
+
+
 -deletar tabela-
 DROP TABLE IF EXISTS pessoa.pessoa;
                                    
+
+
+
+
 
 
 
