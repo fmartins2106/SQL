@@ -383,6 +383,132 @@ select datname from pg_database;
 
 -deletar tabela-
 DROP TABLE IF EXISTS pessoa.pessoa;
+
+
+drop table dbEmpresa if exists;
+drop table dbEmpresa if exists;
+drop table dbEmpresa if exists;
+drop table dbEmpresa if exists;
+drop table dbEmpresa if exists;
+
+create schema if not exists pessoa;
+create schema if not exists pessoa;
+
+create schema if not exists empresa;
+
+alter table empresa.clientes add column nome varchar(100)
+
+alter table empresa.clientes drop column nome;
+
+drop schema if exists empresa
+
+
+create table empresa.clientes(
+	id SERIAL primary key,
+	nome VARCHAR(100) not null,
+	sobrenome VARCHAR(100) not null,
+	data_nascimento DATE not null,
+	CPF VARCHAR(14) not null,
+	id_funcao int not null,
+	constraint fk_funcao foreign key (id_funcao) references empresa.funcao(id)
+);
+
+drop table empresa.clientes 
+
+alter table empresa.funcao drop column nome_funcao
+
+drop table empresa.funcao
+
+
+create table empresa.funcao(
+	id Serial primary key,
+	nome_funcao varchar(100)
+
+);
+
+
+drop table empresa.cliente
+
+
+select datname from pg_database;
+
+
+select
+	table_schema as "Nome da Schema",
+	table_name as "Nome da tabela"
+from
+ 	information_schema.tables 
+where
+	table_type = 'BASE TABLE'
+and
+	table_schema not in ('pg_catalog','information_schema')
+order by table_name;
+
+
+select
+	case extract(DOW from NOW())
+		WHEN 0 THEN 'DOMINGO'
+		WHEN 1 THEN 'SEGUNDA-FEIRA'
+		WHEN 2 THEN 'TERÇA-FEIRA'
+		WHEN 3 THEN 'QUARTA-FEIRA'
+		WHEN 4 THEN 'QUINTA-FEIRA'
+		WHEN 5 THEN 'SEXTA-FEIRA'
+		when 6 then 'SÁBADO'
+	end as "Dia da semana"
+		
+
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                    
 
 
