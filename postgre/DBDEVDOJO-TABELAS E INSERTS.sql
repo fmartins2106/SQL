@@ -62,11 +62,19 @@ create table DB_TELEFONE
 CREATE TABLE DB_DIRETORIA
 (
     id_diretoria  integer generated always as identity PRIMARY KEY,
-    cod_diretoria VARCHAR(5) UNIQUE  NOT NULL,
-    diretoria     varchar(30) UNIQUE NOT NULL,
+    cod_diretoria VARCHAR(5) UNIQUE,
+    diretoria     varchar(30) UNIQUE,
     CONSTRAINT checkDiretoria CHECK ( cod_diretoria <> ''),
     CONSTRAINT checkCodDiretoria check ( cod_diretoria <> '')
 );
+
+alter table DB_DIRETORIA alter column cod_diretoria type varchar(5);
+alter table DB_DIRETORIA alter column diretoria type varchar(30);
+alter table DB_DIRETORIA  add constraint unique_cod_diretoria UNIQUE(cod_diretoria);
+alter table DB_DIRETORIA  add constraint unique_diretoria UNIQUE(diretoria);
+
+
+
 
 
 CREATE TABLE DB_DEPARTAMENTO
@@ -77,11 +85,24 @@ CREATE TABLE DB_DEPARTAMENTO
     cod_diretoria    varchar(5)         not null check ( cod_diretoria <> ''),
     constraint FK_cod_diretoriao FOREIGN KEY (cod_diretoria) references DB_DIRETORIA (cod_diretoria)
 );
+-- Remover a constraint antiga
+ALTER TABLE DB_DEPARTAMENTO
+DROP CONSTRAINT FK_cod_diretoria;
+
+-- 2. Criar novamente com ON UPDATE CASCADE
+ALTER TABLE DB_DEPARTAMENTO
+ADD CONSTRAINT FK_cod_diretoria
+FOREIGN KEY (cod_diretoria)
+REFERENCES DB_DIRETORIA (cod_diretoria)
+ON DELETE SET NULL
+ON UPDATE CASCADE;
+
+
 
 CREATE TABLE DB_CARGO
 (
     id_cargo integer generated always as identity PRIMARY KEY,
-    cargo    varchar(40) UNIQUE NOT NULL CHECK ( cargo <> '')
+    cargo    varchar(40) UNIQUE CHECK ( cargo <> '')
 );
 
 CREATE TABLE DB_TIPO_FUNCIONARIO
@@ -105,6 +126,9 @@ CREATE TABLE DB_FUNCIONARIO
     constraint FK_idCargo FOREIGN KEY (id_cargo) references DB_CARGO(id_cargo),
     constraint FK_idFuncionario FOREIGN KEY (id_nivel_funcionario) references DB_TIPO_FUNCIONARIO (id_nivel_funcionario)
 );
+
+    alter table DB_FUNCIONARIO add
+    constraint FK_id_departamento_funcionario FOREIGN KEY (id_departamento) references DB_DEPARTAMENTO(id_departamento);
 
 CREATE TABLE DB_PRODUTO
 (
