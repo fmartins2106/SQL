@@ -29,7 +29,84 @@ from db_funcionario
 limit 12
 
 select *
+from db_venda;
+
+SELECT extract(YEAR FROM data_venda) as ANO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =1 ) as JANEIRO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =2 ) as FEVEREIRO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =3 ) as MARÇO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =4 ) as ABRIL,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =5 ) as MAIO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =6 ) as JUNHO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =7 ) as JULHO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =8 ) as AGOSTO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =9 ) as SETEMBRO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =10 ) as OUTUBRO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =11 ) as NOVEMBRO,
+       count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =12 ) as DEZEBRO
+FROM db_venda
+GROUP BY EXTRACT(YEAR FROM data_venda)
+ORDER BY ANO;
+
+
+SELECT row_number() over (ORDER BY db_venda.id_cliente,db_venda.data_venda),
+* from db_venda;
+
+
+SELECT extract(year from db_venda.data_venda) as ANO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =1 ) as JANEIRO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =2 ) as FEVEREIRO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =3 ) as MARÇO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =4 ) as ABRIL,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =5 ) as MAIO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =6 ) as JUNHO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =7 ) as JULHO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =8 ) as AGOSTO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =9 ) as SETEMBRO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =10 ) as OUTUBRO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =11 ) as NOVEMBRO,
+       count(*) FILTER ( WHERE EXTRACT(month FROM data_venda) =12 ) as DEZEMBRO
+FROM db_venda
+group by extract(YEAR FROM db_venda.data_venda)
+order by ANO;
+
+SELECT extract(YEAR FROM data_venda) AS ANO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 1) as JANEIRO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 2) as FEVEREIRO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 3) as MARÇO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 4) as ABRIL,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 5) as MAIO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 6) as JUNHO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 7) as JULHO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 8) as AGOSTO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 9) as SETEMBRO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 10) as OUTUBRO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 11) as NOVEMBRO,
+    COUNT(*) FILTER( WHERE EXTRACT(MONTH from db_venda.id_venda) = 12) as DEZEMBRO
 from db_venda
+group by data_venda
+order by ANO;
+
+SELECT * FROM db_venda limit 3;
+
+
+SELECT EXTRACT(YEAR FROM data_venda) AS ANO,
+    count(*) FILTER (WHERE EXTRACT(MONTH FROM data_venda) =1 ) as JANEIRO,
+    count(*) FILTER ( WHERE extract(Month from data_venda) =2 ) as FEVEREIRO,
+    count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =3 ) as MARÇO,
+    count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =4 ) as ABRIL,
+    count(*) FILTER ( WHERE extract(MONTH FROM data_venda) =5 ) as MAIO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =6 ) as JUNHO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =7 ) as JULHO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =8 ) as AGOSTO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =9 ) as SETEMBRO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =10 ) as OUTUBRO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =11 ) as NOVEMBRO,
+    count(*) filter ( where extract(MONTH FROM data_venda) =12 ) as DEZEMBRO
+from db_venda
+GROUP BY EXTRACT(YEAR FROM db_venda.data_venda)
+ORDER BY ANO;
+
 
 SELECT extract(YEAR FROM data_venda)                              as "ANO",
        count(*) FILTER ( WHERE EXTRACT(MONTH FROM data_venda) =1) as Janeiro,
