@@ -58,7 +58,33 @@ while CHARINDEX(' ',@Campo) > 0
 SELECT @Campo
 go
 
+----------------------------------------------------
+SET NOCOUNT ON
+GO
 
+DROP TABLE IF EXISTS #Tbl
+go
 
+DECLARE @Contador INT = 1
+
+select BusinessEntityID,
+       CONCAT_WS(' ',FirstName,MiddleName,LastName) as fullName,
+       ModifiedDate
+       into #Tbl
+from Person.person
+
+CREATE TABLE  #TblDif(
+    ID INT
+)
+
+WHILE @Contador <= (SELECT MAX(BusinessEntityID) from #Tbl)
+    begin
+        SET @Contador += 1
+        INSERT INTO #TblDif
+        values (@Contador)
+
+    end
+
+SELECT * FROM #TblDif
 
 
