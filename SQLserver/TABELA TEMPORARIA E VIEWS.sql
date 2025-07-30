@@ -1980,3 +1980,6 @@ GO
 
 select *
 from VW_CALENDARIO;
+
+
+ 
