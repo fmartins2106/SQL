@@ -8,5 +8,9 @@ Repositório com estudos de banco de dados SQL Server.
 - Filtros e ordenações
 - Modelagem de dados
 - Scripts de criação e manipulação de tabelas
+- Function
+- Views
+- Triggers
 
 ---
+
