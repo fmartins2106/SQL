@@ -383,7 +383,7 @@ DECLARE
 BEGIN
     SELECT EXISTS(SELECT 1
                   FROM db_cliente c
-                           join db_pessoa p ON c.id_pessoa = p.id_pessoa
+                  join db_pessoa p ON c.id_pessoa = p.id_pessoa
                   WHERE p.cpf = digite_cpf)
     INTO existe_cliente;
     return existe_cliente;
@@ -395,6 +395,10 @@ $$ LANGUAGE plpgsql;
 select *
 from db_pessoa
 limit 3;
+
+
+CREATE OR REPLACE CREATE FUNCTION
+
 
 
 

@@ -1,4 +1,4 @@
--views
+
 
 select * from db_venda * limit 20;
 
