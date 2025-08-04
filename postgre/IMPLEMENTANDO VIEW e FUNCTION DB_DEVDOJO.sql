@@ -383,7 +383,7 @@ DECLARE
 BEGIN
     SELECT EXISTS(SELECT 1
                   FROM db_cliente c
-                  join db_pessoa p ON c.id_pessoa = p.id_pessoa
+                           join db_pessoa p ON c.id_pessoa = p.id_pessoa
                   WHERE p.cpf = digite_cpf)
     INTO existe_cliente;
     return existe_cliente;
@@ -391,13 +391,324 @@ end;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION fn_total_vendas_cliente(digite_id_cliente INTEGER)
+    RETURNS NUMERIC as
+$$
+DECLARE
+    total_venda NUMERIC(12, 2);
+BEGIN
+    SELECT COALESCE(sum(total), 0)
+    INTO total_venda
+    from db_venda
+    where id_cliente = digite_id_cliente;
+    return total_venda;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_valor_total_por_venda(digite_id_venda INTEGER)
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    valor_total_por_venda NUMERIC(12, 2);
+BEGIN
+    SELECT COALESCE(sum(quantidade * preco_unitario), 0)
+    INTO valor_total_por_venda
+    FROM db_produto_venda
+    WHERE id_venda = digite_id_venda;
+    RETURN valor_total_por_venda;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_salario_funcionario(digite_matricula INTEGER)
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    salario_funcionario NUMERIC(12, 2)
+BEGIN
+    SELECT COALESCE((salario), 0)
+    INTO salario_funcionario
+    from db_funcionario
+    WHERE matricula = digite_matricula;
+    return salario_funcionario;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_verificar_cadastro_pessoa(digite_cpf VARCHAR)
+    RETURNS VARCHAR AS
+$$
+DECLARE
+    nome_pessoa VARCHAR;
+BEGIN
+    SELECT nome
+    INTO nome_pessoa
+    FROM db_pessoa
+    where cpf = digite_cpf;
+    return nome_pessoa;
+end;
+$$ LANGUAGE plpgsql;
+
+select *
+from fn_verificar_cadastro_pessoa('22345678122');
+
+CREATE OR REPLACE FUNCTION fn_verificar_cadastro_cliente(digite_cpf TEXT)
+    RETURNS TEXT AS
+$$
+DECLARE
+    nome_cliente TEXT;
+BEGIN
+    SELECT p.nome
+    INTO nome_cliente
+    from db_cliente c
+             inner join db_pessoa p
+                        on p.id_pessoa = c.id_pessoa
+    where digite_cpf = p.cpf;
+    return nome_cliente;
+end;
+$$ LANGUAGE plpgsql;
+
+select *
+from fn_verificar_cadastro_cliente('20345678140');
+
+
+
+select *
+from db_cliente
+limit 2;
+
+
 
 select *
 from db_pessoa
+where id_pessoa = 20;
+
+select *
+from db_funcionario
+limit 3;
+
+CREATE OR REPLACE FUNCTION fn_verificar_salario(digite_matricula INTEGER)
+    RETURNS TEXT AS
+$$
+DECLARE
+    valor_salario NUMERIC(12, 2);
+BEGIN
+    SELECT salario
+    INTO valor_salario
+    from db_funcionario
+    WHERE matricula = digite_matricula;
+    IF valor_salario >= 100000 THEN
+        RETURN 'Salário alto';
+    ELSEIF valor_salario >= 5000 THEN
+        RETURN 'Salário média';
+    ELSE
+        RETURN 'Sálario baixo';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_verificar_salario(digite_matricula INTEGER)
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    valor_salario NUMERIC(12, 2)
+BEGIN
+    SELECT salario
+    INTO valor_salario
+    from db_funcionario
+    where matricula = digite_matricula;
+    IF valor_salario >= 10000 THEN
+        RETURN 'Salário alto';
+    ELSEIF valor_salario >= 5000 THEN
+        RETURN 'Salário médio';
+    ELSE
+        RETURN 'Salário baixo!';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_verificar_salario(digite_matricula INTEGER)
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    valor_salario NUMERIC(12, 2);
+BEGIN
+    SELECT salario
+    INTO valor_salario
+    from db_funcionario
+    where matricula = digite_matricula;
+    IF valor_salario >= 10000 THEN
+        RETURN 'Salário muito alto';
+    ELSEIF valor_salario >= 5000 THEN
+        RETURN 'Salário médio';
+    ELSE
+        RETURN 'Salário baixo';
+    end if;
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_verificar_funcionario_diretoria(
+    p_funcionario_id INTEGER,
+    p_diretoria_nome VARCHAR
+) RETURNS VARCHAR AS
+$$
+DECLARE
+    v_nome_diretoria VARCHAR;
+BEGIN
+    SELECT d.diretoria
+    INTO v_nome_diretoria
+    FROM db_funcionario f
+             INNER JOIN db_departamento dep ON f.id_departamento = dep.id_departamento
+             INNER JOIN db_diretoria d ON dep.cod_diretoria = d.cod_diretoria
+    WHERE f.matricula = p_funcionario_id;
+
+    IF v_nome_diretoria IS NULL THEN
+        RETURN 'Funcionário não encontrado ou dados incompletos';
+    ELSIF v_nome_diretoria = p_diretoria_nome THEN
+        RETURN 'FUNCIONÁRIO PERTENCE À DIRETORIA';
+    ELSE
+        RETURN 'FUNCIONÁRIO NÃO PERTENCE À DIRETORIA';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+SELECT *
+FROM fn_verificar_funcionario_diretoria(1002, 'Diretoria de Tecnologia');
+
+
+
+select *
+from db_funcionario
+limit 4;
+select *
+from db_diretoria
+limit 4;
+select *
+from db_cargo;
+select table_schema,
+       table_name
+from information_schema.tables
+where table_type = 'BASE TABLE'
+  and table_schema not in ('pg_catalog', 'information_schema');
+
+select *
+from db_diretoria
 limit 3;
 
 
-CREATE OR REPLACE CREATE FUNCTION
+CREATE OR REPLACE FUNCTION verificar_funcionario_diretoria(
+    funcionario_id INTEGER,
+    diretoria_nome VARCHAR
+) RETURNS VARCHAR AS
+$$
+DECLARE
+    dep_id   INTEGER;
+    dir_id   INTEGER;
+    dir_nome VARCHAR;
+BEGIN
+    SELECT departamento_id INTO dep_id FROM funcionario WHERE id = funcionario_id;
+    SELECT diretoria_id INTO dir_id FROM departamento WHERE id = dep_id;
+    SELECT nome INTO dir_nome FROM diretoria WHERE id = dir_id;
+
+    IF dir_nome = diretoria_nome THEN
+        RETURN 'FUNCIONÁRIO PERTENCE À DIRETORIA';
+    ELSE
+        RETURN 'FUNCIONÁRIO NÃO PERTENCE À DIRETORIA';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+select *
+from db_cliente
+limit 3;
+
+
+
+SELECT *
+from fn_verificar_salario(1001);
+
+select *
+from db_pessoa
+WHERE sexo = 'M';
+
+CREATE OR REPLACE FUNCTION fn_contar_por_sexo(digite_sexo CHAR)
+    RETURNS INTEGER AS
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT COUNT(*)
+    INTO total
+    FROM db_funcionario f
+             JOIN db_pessoa p ON p.id_pessoa = f.id_pessoa
+    WHERE UPPER(p.sexo) = UPPER(digite_sexo);
+    RETURN total;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_contar_por_sexo(digite_sexo CHAR)
+    RETURNS INTEGER AS
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT count(*)
+    INTO total
+    from db_funcionario f
+             inner join db_pessoa p ON p.id_pessoa = f.id_pessoa
+    WHERE p.sexo = upper(digite_sexo);
+    RETURN total;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_contar_por_sexo(digite_sexo CHAR)
+    RETURNS INTEGER AS
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT count(*)
+    INTO total
+    FROM db_funcionario f
+             inner join db_pessoa p
+                        on p.id_pessoa = f.id_pessoa
+    WHERE p.sexo = upper(digite_sexo);
+    RETURN total;
+end;
+$$
+    LANGUAGE plpgsql;
+
+select *
+from fn_contar_por_sexo('F');
+
+
+CREATE OR REPLACE FUNCTION fn_verificar_salario(digite_matricula INTEGER)
+    RETURNS VARCHAR AS
+$$
+DECLARE
+    valor_salario NUMERIC(12, 2);
+BEGIN
+    SELECT COALESCE((salario), 0)
+               salario
+    INTO valor_salario
+    from db_funcionario
+    where matricula = digite_matricula;
+    IF valor_salario >= 10000 then
+        RETURN 'Salário diretoria';
+    ELSIF valor_salario >= 5000 then
+        RETURN 'Salário gerente';
+    ELSE
+        RETURN 'Salário funcionário';
+    end if;
+end;
+$$
+    LANGUAGE plpgsql;
+
 
 
 
