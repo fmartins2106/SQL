@@ -683,6 +683,25 @@ end;
 $$
     LANGUAGE plpgsql;
 
+
+CREATE OR REPLACE FUNCTION fn_contar_por_sexo(digite_sexo CHAR)
+    RETURNS INTEGER AS
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT count(*)
+    INTO total
+    FROM db_funcionario f
+             inner join db_pessoa p
+                        on p.id_pessoa = f.id_pessoa
+    where p.sexo = upper(digite_sexo);
+    RETURN total;
+end;
+$$
+    LANGUAGE plpgsql;
+
+
 select *
 from fn_contar_por_sexo('F');
 
@@ -709,8 +728,281 @@ end;
 $$
     LANGUAGE plpgsql;
 
+CREATE OR REPLACE FUNCTION fn_verificar_salario(digite_matricula INTEGER)
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    salario_funcionario NUMERIC(12, 2);
+BEGIN
+    SELECT COALESCE((salario), 0)
+    INTO salario_funcionario
+    from db_funcionario
+    where matricula = digite_matricula;
+    RETURN salario_funcionario;
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_nivel_salario(digite_matricula INTEGER)
+    RETURNS VARCHAR AS
+$$
+DECLARE
+    salario_funcionario NUMERIC(12, 2)
+BEGIN
+    SELECT COALESCE((salario), 0)
+    INTO salario_funcionario
+    FROM db_funcionario
+    where matricula = digite_matricula;
+    IF salario_funcionario > 10000 THEN
+        return 'Salário de diretoria';
+    ELSIF salario_funcionario > 5000 THEN
+        return 'Salário de gerente';
+    ELSE
+        RETURN 'Salário normal';
+    end if;
+end;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_quantidade_func_por_cargo()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r         record;
+    resultado TEXT := '';
+BEGIN
+    FOR r IN
+        SELECT c.cargo,
+               count(*) AS TOTAL
+        from db_funcionario f
+                 inner join db_cargo c
+                            on f.id_cargo = c.id_cargo
+        GROUP BY c.cargo
+        LOOP
+            resultado := resultado || r.cargo || ': ' || r.total || ' funcionário(s)' || E'\n';
+        end loop;
+    return resultado;
+end;
+$$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION fn_quantidade_func_por_cargo()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r         RECORD;
+    resultado TEXT := '';
+BEGIN
+    FOR r IN
+        SELECT c.cargo,
+               count(*) AS TOTAL
+        from db_funcionario f
+                 inner join db_cargo c
+                            on c.id_cargo = f.id_cargo
+        group by c.cargo
+        LOOP
+            resultado := resultado || r.cargo || ': ' || r.total || 'funcionário(s)' || 'E\n';
+        end loop;
+    return resultado;
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_quantidade_func_por_cargo() -- Cria uma função chamada fn_quantidade_func_por_cargo que não recebe parâmetros
+    RETURNS TEXT AS -- A função retorna um valor do tipo TEXT
+$$
+DECLARE
+    r         RECORD; -- Declara uma variável do tipo RECORD para armazenar os resultados da consulta dentro do loop
+    resultado TEXT := ''; -- Declara e inicializa uma variável texto para acumular os dados que serão retornados
+BEGIN
+    FOR r IN -- Inicia um loop que percorre cada linha do resultado da consulta abaixo
+        SELECT c.cargo,          -- Seleciona o nome do cargo
+               count(*) AS TOTAL -- Conta quantos funcionários existem para aquele cargo
+        FROM db_funcionario f -- Tabela de funcionários, com alias 'f'
+                 INNER JOIN db_cargo c -- Faz um INNER JOIN com a tabela de cargos, alias 'c'
+                            ON c.id_cargo = f.id_cargo -- Condição do JOIN: relaciona os IDs de cargo nas duas tabelas
+        GROUP BY c.cargo -- Agrupa os resultados por cargo (necessário para usar COUNT)
+        LOOP
+            resultado := resultado || r.cargo || ': ' || r.total || ' funcionário(s)' || E'\n';
+            -- Concatena cada resultado na variável 'resultado', com quebra de linha (E'\n' permite caracteres especiais como \n)
+        END LOOP; -- Fim do loop
+    RETURN resultado; -- Retorna o texto acumulado com os cargos e quantidades
+END; -- Fim da função
+$$ LANGUAGE plpgsql; -- Indica que a linguagem usada na função é PL/pgSQL
+
+
+CREATE OR REPLACE FUNCTION fn_aplica_desconto_produtos_caros()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC;
+BEGIN
+    FOR r IN SELECT id_produto, preco FROM db_produto WHERE preco > 500
+        LOOP
+            novo_preco := r.preco * 0.9;
+
+            UPDATE db_produto
+            SET preco = novo_preco
+            WHERE id_produto = r.id_produto;
+        END LOOP;
+
+    RETURN 'Desconto aplicado com sucesso.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_aplica_desconto_produtos_caros()
+    RETURNS TEXT AS
+$$
+
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC(12, 2);
+BEGIN
+    FOR r IN SELECT id_produto, preco FROM db_produto WHERE preco > 500
+        LOOP
+            novo_preco := r.preco * 0.9;
+            UPDATE db_produto
+            SET preco = novo_preco
+            WHERE id_produto = r.id_produto;
+        end loop;
+    return 'Desconto aplicado com sucesso.';
+end;
+$$ language plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_aplicar_desconto_produtos_caros()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        from db_produto
+        where preco > 500
+        LOOP
+            novo_preco := r.preco * 0.9;
+            UPDATE db_produto
+            SET preco = novo_preco
+            WHERE id_produto = r.id_produto;
+        end loop;
+    return 'Desconto aplicado com sucesso.';
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_reajuste_valor_produtos()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        from db_produto
+        where preco > 500
+        LOOP
+            novo_preco := r.preco + (r.preco * 0.09);
+            UPDATE db_produto
+            SET preco = novo_preco
+            WHERE id_produto = r.id_produto;
+        end loop;
+    return 'Reajuste aplicado com sucesso.';
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_reajuste_valor_produtos()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        FROM db_produto
+        where preco > 500
+        LOOP
+            novo_preco := r.preco * 0.10;
+            UPDATE db_produto
+            SET preco = novo_preco
+            where id_produto = r.id_produto;
+        end loop;
+    return 'Desconto concedido com suceso';
+end;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_desconto_preco_produtos()
+    RETURNS TEXT AS
+$$
+DECLARE
+    r          RECORD;
+    novo_preco NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        from db_produto
+        where preco > 500
+        LOOP
+            novo_preco := r.preco * 0.09;
+            UPDATE db_produto
+            SET preco = novo_preco
+            WHERE id_produto = r.id_produto;
+        end loop;
+    return 'Desconto consedido com sucesso';
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_desconto_preco_produtos()
+    RETURNS TEXT AS
+$$
+DECLARE
+r RECORD;
+novo_valor NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT
+            id_produto,
+            preco
+            FROM db_produto
+        where preco > 500
+        LOOP
+        novo_valor = r.id_produto * 0.09;
+        UPDATE db_produto
+        SET preco = novo_valor
+        where id_produto = r.id_produto;
+        end loop;
+    return 'Desconto concedido com sucesso.';
+    end;
+$$ LANGUAGE plpgsql;
+
+
+
+select *
+from db_produto
+where id_produto = 1000;
+
+
+select *
+from fn_reajuste_valor_produtos();
+--1000 3521.89
+
+select *
+from fn_aplica_desconto_produtos_caros();
+
+
+SELECT *
+from fn_quantidade_func_por_cargo();
+
+
+select *
+from db_cargo
+limit 3;
 
 
 
