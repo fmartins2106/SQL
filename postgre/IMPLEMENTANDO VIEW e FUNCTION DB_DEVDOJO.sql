@@ -1131,6 +1131,9 @@ from db_cargo
 limit 3;
 
 
+CREATE EXTENSION pg_cron;
+
+
 
 
 
