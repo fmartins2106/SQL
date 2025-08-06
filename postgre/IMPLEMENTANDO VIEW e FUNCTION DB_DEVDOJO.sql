@@ -962,24 +962,150 @@ CREATE OR REPLACE FUNCTION fn_desconto_preco_produtos()
     RETURNS TEXT AS
 $$
 DECLARE
-r RECORD;
-novo_valor NUMERIC(12, 2);
+    r          RECORD;
+    novo_valor NUMERIC(12, 2);
 BEGIN
     FOR r IN
-        SELECT
-            id_produto,
-            preco
-            FROM db_produto
+        SELECT id_produto,
+               preco
+        FROM db_produto
         where preco > 500
         LOOP
-        novo_valor = r.id_produto * 0.09;
-        UPDATE db_produto
-        SET preco = novo_valor
-        where id_produto = r.id_produto;
+            novo_valor = r.preco * 0.09;
+            UPDATE db_produto
+            SET preco = novo_valor
+            where id_produto = r.id_produto;
         end loop;
     return 'Desconto concedido com sucesso.';
-    end;
+end;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_desconto_preco_produtos()
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    r          RECORD;
+    novo_valor NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        from db_produto
+        where preco > 500
+        LOOP
+            novo_valor = r.id_produto * 0.09;
+            UPDATE db_produto
+            SET preco = novo_valor
+            where id_produto = r.id_produto;
+        end loop;
+end;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_reajuste_valor_produtos()
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    r          RECORD;
+    novo_valor NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        FROM db_produto
+        where r.preco > 500
+        LOOP
+            novo_valor = r.preco + (r.preco * 0.10);
+            UPDATE db_produto
+            SET preco = novo_valor
+            WHERE id_produto = r.id_produto;
+        end loop;
+end;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_reajuste_valor_produto()
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    r          RECORD;
+    novo_valor NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        FROM db_produto
+        where preco > 500
+        LOOP
+            novo_valor = r.preco + (r.preco * 0.09);
+            UPDATE db_produto
+            SET preco = novo_valor
+            where id_produto = r.id_produto;
+        end loop;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_contador_por_sexo(digite_tipo_sexo CHAR)
+    RETURNS INTEGER as
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT count(sexo)
+    INTO total
+    FROM db_pessoa
+    where sexo = digite_tipo_sexo;
+    return total;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_sexo_funcionario(digite_sexo_consulta CHAR)
+    RETURNS INTEGER AS
+$$
+DECLARE
+    total INTEGER;
+BEGIN
+    SELECT count(sexo)
+    FROM db_funcionario f
+             inner join db_pessoa p
+                        on p.id_pessoa = f.id_pessoa
+    where p.sexo = digite_sexo_consulta;
+    RETURN total;
+end;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_aplica_desconto_produtos_caros()
+    RETURNS NUMERIC AS
+$$
+DECLARE
+    r                   RECORD;
+    novo_valor_desconto NUMERIC(12, 2);
+BEGIN
+    FOR r IN
+        SELECT id_produto,
+               preco
+        FROM db_produto
+        where preco > 500
+        LOOP
+            novo_valor_desconto = r.preco - (r.preco * 0.10);
+            UPDATE db_produto
+            SET preco = novo_valor_desconto
+            WHERE id_produto = r.id_produto;
+        end loop;
+end;
+
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION fn_aplica_desconto_produtos_caros();
+
+
+
+
+
 
 
 
