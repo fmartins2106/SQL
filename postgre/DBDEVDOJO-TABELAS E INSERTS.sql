@@ -349,28 +349,28 @@ INSERT INTO DB_PESSOA (nome, cpf, sexo, email) VALUES
 ('Carlos Oliveira', '32345678123', 'M', 'carlos.oliveira@email.com'),
 ('Mariana Lima', '42345678124', 'F', 'mariana.lima@email.com'),
 ('João Silva', '52345678125', 'M', 'joao.silva@email.com'),
-('Patrícia Costa', '62345678126', 'F', 'patricia.costa@email.com'),
+('Patrícia Machado', '62345678126', 'F', 'patricia.Machado@email.com'),
 ('Ricardo Alves', '72345678127', 'M', 'ricardo.alves@email.com'),
 ('Juliana Fernandes', '82345678128', 'F', 'juliana.fernandes@email.com'),
-('Roberto Santos', '92345678129', 'M', 'roberto.santos@email.com'),
-('Carla Rodrigues', '10345678130', 'F', 'carla.rodrigues@email.com'),
+('Roberto Silva', '92345678129', 'M', 'roberto.Silva@email.com'),
+('Carla Martins', '10345678130', 'F', 'carla.Martins@email.com'),
 ('Paulo Mendes', '11345678131', 'M', 'paulo.mendes@email.com'),
-('Aline Pereira', '12345678132', 'F', 'aline.pereira@email.com'),
+('Aline Silva', '12345678132', 'F', 'aline.Silva@email.com'),
 ('Marcelo Ribeiro', '13345678133', 'M', 'marcelo.ribeiro@email.com'),
 ('Bruna Castro', '14345678134', 'F', 'bruna.castro@email.com'),
 ('André Barros', '15345678135', 'M', 'andre.barros@email.com'),
-('Sofia Gomes', '16345678136', 'F', 'sofia.gomes@email.com'),
+('Sofia Amaral', '16345678136', 'F', 'sofia.Amaral@email.com'),
 ('Felipe Nascimento', '17345678137', 'M', 'felipe.nascimento@email.com'),
 ('Larissa Rocha', '18345678138', 'F', 'larissa.rocha@email.com'),
 ('Diego Carvalho', '19345678139', 'M', 'diego.carvalho@email.com'),
 ('Gabriela Freitas', '20345678140', 'F', 'gabriela.freitas@email.com'),
 ('Lucas Martins', '21345678141', 'M', 'lucas.martins@email.com'),
 ('Amanda Dias', '22345678142', 'F', 'amanda.dias@email.com'),
-('Rafael Costa', '23345678143', 'M', 'rafael.costa@email.com'),
+('Rafael Machado', '23345678143', 'M', 'rafael.Machado@email.com'),
 ('Bianca Silva', '24345678144', 'F', 'bianca.silva@email.com'),
 ('Eduardo Souza', '25345678145', 'M', 'eduardo.souza@email.com'),
 ('Camila Lima', '26345678146', 'F', 'camila.lima@email.com'),
-('Vinícius Santos', '27345678147', 'M', 'vinicius.santos@email.com'),
+('Vinícius Silva', '27345678147', 'M', 'vinicius.Silva@email.com'),
 ('Isabela Rocha', '28345678148', 'F', 'isabela.rocha@email.com'),
 ('Matheus Oliveira', '29345678149', 'M', 'matheus.oliveira@email.com'),
 ('Fernanda Carvalho', '30345678150', 'F', 'fernanda.carvalho@email.com'),
@@ -379,7 +379,7 @@ INSERT INTO DB_PESSOA (nome, cpf, sexo, email) VALUES
 ('Thiago Martins', '33345678153', 'M', 'thiago.martins@email.com'),
 ('Marina Dias', '34345678154', 'F', 'marina.dias@email.com'),
 ('Bruno Freitas', '35345678155', 'M', 'bruno.freitas@email.com'),
-('Tatiana Gomes', '36345678156', 'F', 'tatiana.gomes@email.com'),
+('Tatiana Amaral', '36345678156', 'F', 'tatiana.Amaral@email.com'),
 ('Fábio Mendes', '37345678157', 'M', 'fabio.mendes@email.com'),
 ('Natália Castro', '38345678158', 'F', 'natalia.castro@email.com'),
 ('Anderson Nascimento', '39345678159', 'M', 'anderson.nascimento@email.com'),
@@ -388,12 +388,62 @@ INSERT INTO DB_PESSOA (nome, cpf, sexo, email) VALUES
 ('Priscila Lima', '42345678162', 'F', 'priscila.lima@email.com'),
 ('Alexandre Dias', '43345678163', 'M', 'alexandre.dias@email.com'),
 ('Carolina Martins', '44345678164', 'F', 'carolina.martins@email.com'),
-('Diego Rodrigues', '45345678165', 'M', 'diego.rodrigues@email.com'),
+('Diego Martins', '45345678165', 'M', 'diego.Martins@email.com'),
 ('Renata Oliveira', '46345678166', 'F', 'renata.oliveira@email.com'),
-('Marcelo Gomes', '47345678167', 'M', 'marcelo.gomes@email.com'),
-('Sabrina Santos', '48345678168', 'F', 'sabrina.santos@email.com'),
+('Marcelo Amaral', '47345678167', 'M', 'marcelo.Amaral@email.com'),
+('Sabrina Silva', '48345678168', 'F', 'sabrina.Silva@email.com'),
 ('Ricardo Alves', '49345678169', 'M', 'ricardo.alves@email.com');
 
+INSERT INTO DB_PESSOA (nome, cpf, sexo, email) VALUES
+('Fernando Martins', '00100100101', 'M', 'fernando@gmail.com'),
+('Ana Souza', '00100100102', 'F', 'ana.souza@email.com'),
+('Carlos Oliveira', '00100100103', 'M', 'carlos.oliveira@email.com'),
+('Mariana Lima', '00100100104', 'F', 'mariana.lima@email.com'),
+('João Silva', '00100100105', 'M', 'joao.silva@email.com'),
+('Patrícia Machado', '00100100106', 'F', 'patricia.Machado@email.com'),
+('Ricardo Alves', '00100100107', 'M', 'ricardo.alves@email.com'),
+('Juliana Fernandes', '00100100108', 'F', 'juliana.fernandes@email.com'),
+('Roberto Silva', '00100100109', 'M', 'roberto.Silva@email.com'),
+('Carla Martins', '00100100110', 'F', 'carla.Martins@email.com'),
+('Paulo Mendes', '00100100111', 'M', 'paulo.mendes@email.com'),
+('Aline Silva', '00100100112', 'F', 'aline.Silva@email.com'),
+('Marcelo Ribeiro', '00100100113', 'M', 'marcelo.ribeiro@email.com'),
+('Bruna Castro', '00100100114', 'F', 'bruna.castro@email.com'),
+('André Barros', '00100100115', 'M', 'andre.barros@email.com'),
+('Sofia Amaral', '00100100116', 'F', 'sofia.Amaral@email.com'),
+('Felipe Nascimento', '00100100117', 'M', 'felipe.nascimento@email.com'),
+('Larissa Rocha', '00100100118', 'F', 'larissa.rocha@email.com'),
+('Diego Carvalho', '00100100119', 'M', 'diego.carvalho@email.com'),
+('Gabriela Freitas', '00100100120', 'F', 'gabriela.freitas@email.com'),
+('Lucas Martins', '00100100121', 'M', 'lucas.martins@email.com'),
+('Amanda Dias', '00100100122', 'F', 'amanda.dias@email.com'),
+('Rafael Machado', '00100100123', 'M', 'rafael.Machado@email.com'),
+('Bianca Silva', '00100100124', 'F', 'bianca.silva@email.com'),
+('Eduardo Souza', '00100100125', 'M', 'eduardo.souza@email.com'),
+('Camila Lima', '00100100126', 'F', 'camila.lima@email.com'),
+('Vinícius Silva', '00100100127', 'M', 'vinicius.Silva@email.com'),
+('Isabela Rocha', '00100100128', 'F', 'isabela.rocha@email.com'),
+('Matheus Oliveira', '00100100129', 'M', 'matheus.oliveira@email.com'),
+('Fernanda Carvalho', '00100100130', 'F', 'fernanda.carvalho@email.com'),
+('Gustavo Barros', '00100100131', 'M', 'gustavo.barros@email.com'),
+('Letícia Ribeiro', '00100100132', 'F', 'leticia.ribeiro@email.com'),
+('Thiago Martins', '00100100133', 'M', 'thiago.martins@email.com'),
+('Marina Dias', '00100100134', 'F', 'marina.dias@email.com'),
+('Bruno Freitas', '00100100135', 'M', 'bruno.freitas@email.com'),
+('Tatiana Amaral', '00100100136', 'F', 'tatiana.Amaral@email.com'),
+('Fábio Mendes', '00100100137', 'M', 'fabio.mendes@email.com'),
+('Natália Castro', '00100100138', 'F', 'natalia.castro@email.com'),
+('Anderson Nascimento', '00100100139', 'M', 'anderson.nascimento@email.com'),
+('Júlia Ribeiro', '00100100140', 'F', 'julia.ribeiro@email.com'),
+('Leandro Souza', '00100100141', 'M', 'leandro.souza@email.com'),
+('Priscila Lima', '00100100142', 'F', 'priscila.lima@email.com'),
+('Alexandre Dias', '00100100143', 'M', 'alexandre.dias@email.com'),
+('Carolina Martins', '00100100144', 'F', 'carolina.martins@email.com'),
+('Diego Martins', '00100100145', 'M', 'diego.Martins@email.com'),
+('Renata Oliveira', '00100100146', 'F', 'renata.oliveira@email.com'),
+('Marcelo Amaral', '00100100147', 'M', 'marcelo.Amaral@email.com'),
+('Sabrina Silva', '00100100148', 'F', 'sabrina.Silva@email.com'),
+('Ricardo Alves', '00100100149', 'M', 'ricardo.alves@email.com');
 
 INSERT INTO DB_LOGRADOURO(descricao_logradouro)
 VALUES
@@ -739,6 +789,91 @@ INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1008', 107, 97
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1009', 108, 598.00);
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1010', 109, 1149.80);
 
+--------------------
+
+    INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2000', 110, 2150.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2001', 111, 3475.45);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2002', 112, 4200.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2003', 113, 2599.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2004', 114, 3100.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2005', 115, 2233.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2006', 116, 2900.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2007', 117, 3725.75);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2008', 118, 4980.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2009', 119, 2199.50);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2010', 120, 2390.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2011', 121, 4100.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2012', 122, 3899.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2013', 123, 2300.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2014', 124, 2790.45);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2015', 125, 5020.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2016', 126, 3150.75);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2017', 127, 2855.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2018', 128, 4399.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2019', 129, 2780.00);
+
+____________________________
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2000', 100, 2150.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2001', 101, 3475.45);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2002', 102, 4200.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2003', 103, 2599.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2004', 104, 3100.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2005', 105, 2233.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2006', 106, 2900.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2007', 107, 3725.75);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2008', 108, 4980.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2009', 109, 2199.50);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2010', 110, 2390.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2011', 111, 4100.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2012', 112, 3899.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2013', 113, 2300.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2014', 114, 2790.45);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2015', 115, 5020.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2016', 116, 3150.75);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2017', 117, 2855.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2018', 118, 4399.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA2019', 119, 2780.00);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3020', 120, 3180.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3021', 121, 2955.50);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3022', 122, 3433.20);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3023', 123, 2600.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3024', 124, 3000.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3025', 125, 4099.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3026', 126, 5000.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3027', 127, 2180.25);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3028', 128, 3770.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3029', 129, 2822.10);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3030', 101, 2210.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3031', 101, 2499.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3032', 102, 3800.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3033', 103, 2222.22);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3034', 104, 4567.89);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3035', 105, 4200.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3036', 106, 3350.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3037', 107, 2980.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3038', 108, 3240.40);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3039', 109, 2111.00);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3040', 110, 4199.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3041', 111, 3050.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3042', 112, 2700.10);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3043', 113, 3920.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3044', 114, 2660.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3045', 115, 3188.88);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3046', 116, 4444.44);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3047', 117, 3999.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3048', 118, 2890.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3049', 119, 2133.30);
+
+
+--------------------
+
+
 -- Vendas
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1001', 100, 5988.90);
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1002', 101, 1129.80);
@@ -750,6 +885,7 @@ INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1007', 106, 19
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1008', 107, 979.70);
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1009', 108, 598.00);
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1010', 109, 1149.80);
+
 
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (12, 1003, 3989.00, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3, 1002, 1999.90, 1);
