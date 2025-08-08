@@ -1104,6 +1104,26 @@ DROP FUNCTION fn_aplica_desconto_produtos_caros();
 
 
 
+SELECT * FROM pg_extension WHERE extname = 'pg_cron';
+SELECT * FROM cron.job
+WHERE database = current_database();
+
+UPDATE cron.job SET active = true WHERE jobid = 18844;
+SELECT * FROM pg_extension;
+
+
+SELECT jobid, jobname, schedule, command, nodename, nodeport, database, username, active
+FROM cron.job;
+
+
+SELECT cron.schedule(
+  'relatorio_teste_5min',            -- nome do job (opcional, mas ajuda)
+  '*/5 * * * *',                     -- cron: a cada 5 minutos
+  $$CALL gerar_relatorio();$$       -- comando SQL
+);
+
+
+
 
 
 
