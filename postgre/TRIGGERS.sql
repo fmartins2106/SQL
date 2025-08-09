@@ -35,3 +35,14 @@ CREATE TRIGGER trg_set_updated_at
     ON db_pessoa
     FOR EACH ROW
 EXECUTE FUNCTION set_update_at();
+
+--------------------------
+
+
+
+
+
+
+
+
+
