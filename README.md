@@ -1,6 +1,6 @@
 # Estudos SQLserver e PostgreSQL
 
-Repositório com estudos de banco de dados SQL Server.
+Repositório com estudos de banco de dados SQL Server e PosgreSQL.
 
 ## Conteúdos
 
@@ -13,4 +13,5 @@ Repositório com estudos de banco de dados SQL Server.
 - Triggers
 
 ---
+
 
