@@ -305,12 +305,288 @@ CREATE OR REPLACE TRIGGER tgr_impedir_alteracao_data_venda
     FOR EACH ROW
 EXECUTE FUNCTION fn_impedir_alteracao_data_venda();
 
-select * from db_venda where id_venda = 21;
+SELECT *
+FROM db_venda
+WHERE id_venda = 21;
 
-UPDATE db_venda SET data_venda = '2025-08-26' where id_venda = 21;
+UPDATE db_venda
+SET data_venda = '2025-08-26'
+WHERE id_venda = 21;
+
+-------------------------------------------
+CREATE OR REPLACE FUNCTION fn_atualizar()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.data_atualizacao = NOW();
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_ultima_modificacao_db_diretoria
+    BEFORE UPDATE
+    ON db_diretoria
+    FOR EACH ROW
+EXECUTE FUNCTION set_atualizacao();
+
+UPDATE db_diretoria
+SET diretoria = 'Diretoria de logistica'
+WHERE id_diretoria = 5;
+
+ALTER TABLE db_diretoria
+    ADD COLUMN ultima_atualizacao TIMESTAMP;
+
+SELECT *
+FROM db_diretoria
+WHERE id_diretoria = 5;
+
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+SELECT *
+FROM db_produto_venda;
+
+SELECT *
+FROM db_tipo_telefone;
+
+CREATE OR REPLACE FUNCTION fn_tipo_telefone_nao_alterar()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.tipo_telefone IS DISTINCT FROM old.tipo_telefone THEN
+        RAISE EXCEPTION 'Campo tipo telefone não pode ser alterado.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_alteracao_tipo_telefone_db_tipo_telefone
+    BEFORE UPDATE
+    ON db_tipo_telefone
+    FOR EACH ROW
+EXECUTE FUNCTION fn_tipo_telefone_nao_alterar();
 
 
+SELECT *
+FROM db_tipo_telefone
+WHERE id_tipo_telefone = 1;
+
+UPDATE db_tipo_telefone
+SET tipo_telefone = 'Telefone ceular'
+WHERE id_tipo_telefone = 1;
+
+--------------------------------------------------
+SELECT *
+FROM db_produto
+LIMIT 10;
+
+CREATE OR REPLACE FUNCTION fn_validacao_valor_produto()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 50 OR new.preco > 10000 THEN
+        RAISE EXCEPTION 'Preço dos produtos não pode ser menor que R$50 ou maior que R$100';
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_preco_produto_invalido_db_produto
+    BEFORE INSERT OR UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validacao_valor_produto();
+
+SELECT *
+FROM db_produto
+WHERE id_produto = 1001;
+
+UPDATE db_produto
+SET preco = 40
+WHERE id_produto = 1001;
 
 
+SELECT *
+FROM db_venda
+ORDER BY total;
+
+CREATE OR REPLACE FUNCTION fn_valor_minimo_faturamento()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.total < 100 THEN
+        RAISE EXCEPTION 'Valor mínimo para faturamento não pode ser menor que R$100,00';
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+SELECT *
+FROM db_venda
+WHERE id_venda = 195;
+DELETE
+FROM db_venda
+WHERE id_venda = 195;
+
+CREATE OR REPLACE TRIGGER trg_valor_minimo_faturamento_db_venda
+    BEFORE INSERT
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_valor_minimo_faturamento();
+
+INSERT INTO db_venda(documento, id_cliente, data_venda, total)
+VALUES ('VENDA3021', 102, '2025-08-09', 50);
+
+CREATE TRIGGER trg_valida_preco
+    BEFORE INSERT OR UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION valida_preco_produto();
+
+SELECT *
+FROM db_venda
+LIMIT 3;
+
+SELECT *
+FROM db_pessoa
+LIMIT 3;
+
+ALTER TABLE db_pessoa
+    ADD COLUMN ativo BOOLEAN;
+
+UPDATE db_pessoa
+SET ativo = TRUE
+WHERE ativo IS NULL;
+
+CREATE OR REPLACE FUNCTION fn_proibido_excluir_cadastro_pessoa()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido exclusão do cadastro, somente pode ser marcado como inativo. Entrar em contato com DBA';
+    RETURN old;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_proibido_excluir_cadastro_pessoa
+    BEFORE DELETE
+    ON db_pessoa
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_excluir_cadastro_pessoa();
+
+DELETE
+FROM db_pessoa
+WHERE id_pessoa = 2;
 
 
+SELECT *
+FROM db_venda
+LIMIT 10;
+
+ALTER TABLE db_venda
+    ADD COLUMN ativo BOOLEAN;
+UPDATE db_venda
+SET ativo = TRUE
+WHERE ativo IS NULL;
+
+DELETE
+FROM db_venda
+WHERE id_venda = 127;
+
+SELECT *
+FROM db_funcionario;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_excluir_venda()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir venda do sistema. Utilize opção inativar venda. Entre em contat com DBA.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER thr_proibido_excluir_venda
+    BEFORE DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_excluir_venda();
+
+ALTER TABLE db_funcionario
+    ADD COLUMN ativo BOOLEAN;
+SELECT *
+FROM db_funcionario
+LIMIT 50;
+
+UPDATE db_funcionario
+SET ativo = FALSE
+WHERE data_demissao IS NOT NULL;
+
+CREATE OR REPLACE FUNCTION fn_demissao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_demissao IS NOT NULL THEN
+        new.ativo = FALSE;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_demissao
+    BEFORE UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_demissao();
+
+UPDATE db_funcionario
+SET data_demissao = '2025-08-10'
+WHERE matricula = 1015;
+SELECT *
+FROM db_funcionario
+WHERE matricula = 1015;
+
+CREATE OR REPLACE FUNCTION fn_proibido_exclusao_funcionario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir cadastro de funcionário. Utilizar campo Ativo e escolha opção inativo.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_excluir_cadadastro_funcionario
+    BEFORE DELETE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_exclusao_funcionario();
+
+DELETE from db_funcionario where matricula = 1015;
+
+CREATE OR REPLACE FUNCTION fn_validacao_inativar()
+RETURNS TRIGGER as $$
+    BEGIN
+        IF new.ativo = FALSE and new.data_demissao is NULL then
+            RAISE EXCEPTION 'Cadastro de funcionário só pode ser inativo apos preenchimento da ta de demissão.';
+        END IF;
+        RETURN new;
+    END;
+    $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_validacao_inativar
+    BEFORE UPDATE
+    on db_funcionario
+    for EACH ROW
+    EXECUTE FUNCTION fn_validacao_inativar();
+
+UPDATE db_funcionario SET data_demissao = '2025-09-10' where matricula = 1018;
+select * from db_funcionario where matricula = 1018;
+UPDATE db_funcionario SET ativo = false where matricula = 1018;

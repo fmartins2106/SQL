@@ -175,12 +175,13 @@ CREATE TABLE DB_PRODUTO_VENDA
     constraint fk_id_Venda_produto FOREIGN KEY (id_venda) REFERENCES DB_VENDA (id_venda),
     constraint fk_id_produto_venda FOREIGN KEY (id_produto) references DB_PRODUTO (id_produto)
 );
+select * from db_produto;
 
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (11, 1001, 3989.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (11, 1002, 1999.90, 2);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (12, 1003, 849.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (12, 1004, 279.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (13, 1005, 479.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1001, 3989.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1002, 1999.90, 2);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1003, 849.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1004, 279.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3, 1005, 479.90, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (13, 1006, 299.00, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (14, 1007, 1249.99, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (14, 1008, 849.00, 1);
@@ -196,54 +197,54 @@ INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) 
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (19, 1018, 589.90, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (20, 1019, 999.00, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (20, 1020, 1999.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1022, 79.90, 3);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1022, 899.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1023, 149.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1024, 679.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (23, 1025, 3899.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (23, 1026, 4399.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (24, 1027, 449.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (24, 1028, 349.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (25, 1029, 2799.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (25, 1030, 229.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (26, 1031, 189.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (26, 1032, 159.99, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (27, 1033, 249.90, 2);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (27, 1034, 329.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (28, 1035, 134.50, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (28, 1036, 175.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (29, 1037, 299.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (29, 1038, 179.99, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (30, 1039, 89.00, 2);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (30, 1040, 349.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (31, 1041, 399.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (31, 1042, 149.99, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (32, 1043, 499.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (32, 1044, 84.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (33, 1045, 199.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (33, 1046, 289.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (34, 1047, 239.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (34, 1048, 169.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (35, 1049, 179.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (35, 1050, 899.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (36, 1051, 74.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (36, 1052, 159.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (37, 1053, 199.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (37, 1054, 98.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (38, 1055, 132.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (38, 1056, 64.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (39, 1057, 449.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (39, 1058, 109.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (40, 1059, 219.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (40, 1060, 189.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (41, 1061, 329.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (41, 1062, 259.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (42, 1063, 549.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (42, 1064, 189.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (43, 1065, 379.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (43, 1066, 499.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (44, 1009, 62.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (44, 1009, 119.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1011, 79.90, 3);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (21, 1012, 899.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1011, 149.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (22, 1014, 679.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (23, 1011, 3899.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (23, 1014, 4399.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (24, 1014, 449.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (24, 1015, 349.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (25, 1015, 2799.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (25, 1011, 229.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (26, 1015, 189.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (26, 1016, 159.99, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (27, 1016, 249.90, 2);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (27, 1016, 329.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (28, 1017, 134.50, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (28, 1017, 175.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (29, 1017, 299.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (29, 1019, 179.99, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (30, 1010, 89.00, 2);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (30, 1010, 349.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (31, 1010, 399.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (31, 1010, 149.99, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (32, 1019, 499.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (32, 1010, 84.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (33, 1018, 199.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (33, 1011, 289.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (34, 1011, 239.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (34, 1011, 169.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (35, 1011, 179.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (35, 1014, 899.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (36, 1014, 74.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (36, 1014, 159.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (37, 1014, 199.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (37, 1014, 98.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (38, 1014, 132.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (38, 1013, 64.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (39, 1013, 449.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (39, 1013, 109.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (40, 1013, 219.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (40, 1013, 189.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (41, 1011, 329.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (41, 1011, 259.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (42, 1011, 549.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (42, 1011, 189.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (43, 1011, 379.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (43, 1011, 499.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (44, 1012, 62.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (44, 1012, 119.90, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (45, 1009, 88.90, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (45, 1009, 74.90, 1);
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (46, 1009, 168.00, 1);
@@ -258,6 +259,42 @@ INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) 
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (50, 1009, 439.90, 1);
 
 -- Map de preços para os produtos 1001 a 1020
+]
+
+select * from db_produto_venda;
+
+DO $$
+DECLARE
+    v RECORD;
+    p RECORD;
+    num_itens INT;
+    valor_restante NUMERIC(12,2);
+BEGIN
+    FOR v IN SELECT * FROM DB_VENDA LOOP
+        num_itens := FLOOR(2 + RANDOM() * 3); -- entre 2 e 4 produtos
+        valor_restante := v.total;
+
+        FOR i IN 1..num_itens LOOP
+            SELECT id_produto, preco
+            INTO p
+            FROM DB_PRODUTO
+            ORDER BY RANDOM()
+            LIMIT 1;
+
+            INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade)
+            VALUES (
+                v.id_venda,
+                p.id_produto,
+                p.preco,
+                1
+            );
+
+            valor_restante := valor_restante - p.preco;
+            EXIT WHEN valor_restante <= 0;
+        END LOOP;
+    END LOOP;
+END $$;
+
 -- 1001 = 3989.00
 -- 1002 = 1999.90
 -- 1003 = 849.90
@@ -903,35 +940,35 @@ INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) 
 
 INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (7, 1009, 1999.00, 1);
 
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (8, 1002, 399.90, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (8, 1003, 579.80, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3013, 1002, 399.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3013, 1003, 579.80, 1);
 
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (9, 1016, 299.00, 2);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3011, 1016, 299.00, 2);
 
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (10, 1010, 599.00, 1);
-INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (10, 1011, 549.80, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3011, 1010, 599.00, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade) VALUES (3011, 1011, 549.80, 1);
 
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1011', 110, 4599.50);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1012', 111, 2599.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1013', 112, 899.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1014', 113, 1299.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1015', 114, 3499.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1016', 115, 799.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1017', 116, 1499.80);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1018', 117, 1099.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1019', 118, 3999.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1020', 119, 689.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3011', 110, 4599.50);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3012', 111, 2599.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3013', 112, 899.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3014', 113, 1299.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3015', 114, 3499.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3016', 115, 799.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3017', 116, 1499.80);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3018', 117, 1099.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3019', 118, 3999.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA3020', 119, 689.90);
 
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1021', 120, 1599.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1022', 121, 1799.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1023', 122, 2299.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1024', 123, 1099.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1025', 124, 799.99);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1026', 125, 1499.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1027', 126, 2999.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1028', 127, 3899.90);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1029', 128, 679.00);
-INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1030', 129, 1199.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22021', 120, 1599.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22022', 121, 1799.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22023', 122, 2299.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22024', 123, 1099.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22025', 124, 799.99);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22026', 125, 1499.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22027', 126, 2999.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22028', 127, 3899.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22029', 128, 679.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA22030', 129, 1199.90);
 
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1031', 111, 1599.90);
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1032', 101, 349.90);
@@ -957,3 +994,4 @@ INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1049', 118, 17
 INSERT INTO DB_VENDA (documento, id_cliente, total) VALUES ('VENDA1050', 119, 2399.00);
 
 
+select * from db_venda;
