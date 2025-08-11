@@ -569,24 +569,253 @@ CREATE OR REPLACE TRIGGER tgr_proibido_excluir_cadadastro_funcionario
     FOR EACH ROW
 EXECUTE FUNCTION fn_proibido_exclusao_funcionario();
 
-DELETE from db_funcionario where matricula = 1015;
+DELETE
+FROM db_funcionario
+WHERE matricula = 1015;
 
 CREATE OR REPLACE FUNCTION fn_validacao_inativar()
-RETURNS TRIGGER as $$
-    BEGIN
-        IF new.ativo = FALSE and new.data_demissao is NULL then
-            RAISE EXCEPTION 'Cadastro de funcionário só pode ser inativo apos preenchimento da ta de demissão.';
-        END IF;
-        RETURN new;
-    END;
-    $$ LANGUAGE plpgsql;
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.ativo = FALSE AND new.data_demissao IS NULL THEN
+        RAISE EXCEPTION 'Cadastro de funcionário só pode ser inativo apos preenchimento da ta de demissão.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER trg_validacao_inativar
     BEFORE UPDATE
-    on db_funcionario
-    for EACH ROW
-    EXECUTE FUNCTION fn_validacao_inativar();
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validacao_inativar();
 
-UPDATE db_funcionario SET data_demissao = '2025-09-10' where matricula = 1018;
-select * from db_funcionario where matricula = 1018;
-UPDATE db_funcionario SET ativo = false where matricula = 1018;
+UPDATE db_funcionario
+SET data_demissao = '2025-09-10'
+WHERE matricula = 1018;
+SELECT *
+FROM db_funcionario
+WHERE matricula = 1018;
+UPDATE db_funcionario
+SET ativo = FALSE
+WHERE matricula = 1018;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_excluir_cadastro_funcionario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir dados funcionario';
+    RETURN old;
+END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER trg_proibido_excluir_cadastro_funcionario
+    BEFORE DELETE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_exclusao_funcionario();
+
+SELECT *
+FROM db_funcionario
+LIMIT 3;
+
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+CREATE OR REPLACE FUNCTION fn_bloquear_produto()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido exclusão de produtos. use campo ativo e marque como desativado.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_bloquear_exclusao_produto
+    BEFORE DELETE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_produto();
+
+DELETE
+FROM db_produto
+WHERE id_produto = 1003;
+
+ALTER TABLE db_produto
+    ADD COLUMN ativo BOOLEAN;
+
+UPDATE db_produto
+SET ativo = TRUE
+WHERE ativo IS NULL;
+
+
+SELECT *
+FROM db_produto
+LIMIT 3;
+
+SELECT *
+FROM db_venda
+LIMIT 3;
+
+
+CREATE OR REPLACE FUNCTION fn_alteracao_id_cliente()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.id_cliente != old.id_cliente THEN
+        RAISE EXCEPTION 'Erro, nome do cliente não pode ser alterado.';
+    END IF;
+    RETURN old;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_alteracao_id_cliente
+    BEFORE UPDATE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_alteracao_id_cliente();
+
+
+UPDATE db_venda
+SET id_cliente = 128
+WHERE id_venda = 127;
+
+SELECT *
+FROM db_pessoa
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_alterar_cpf()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.cpf != old.cpf THEN
+        RAISE EXCEPTION 'Erro, campo CPF não pode ser alterado. Consulte DBA.';
+    END IF;
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_cpf
+    BEFORE UPDATE
+    ON db_pessoa
+    FOR EACH ROW
+EXECUTE FUNCTION fn_alterar_cpf();
+
+UPDATE db_pessoa
+SET cpf = '11111112343'
+WHERE id_pessoa = 3;
+
+SELECT *
+FROM db_funcionario
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_salario_minimo()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.salario < 1510 THEN
+        RAISE EXCEPTION 'Salário não pode ser menor que salário mínimo.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_salario_minimo
+    BEFORE INSERT OR UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_salario_minimo();
+
+SELECT *
+FROM db_funcionario
+ORDER BY matricula DESC;
+UPDATE db_funcionario
+SET salario = 1000
+WHERE matricula = 1020;
+
+INSERT INTO db_funcionario(id_pessoa, data_admissao, data_demissao, salario, id_cargo, id_departamento,
+                           id_nivel_funcionario, ativo)
+VALUES (4, '2022-05-05', NULL, 94.85, 4, 5, 4, TRUE);
+
+
+CREATE OR REPLACE FUNCTION fn_padrao_cep()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.cep = REGEXP_REPLACE(new.cep, '\D', '', 'g');
+    new.endereco = INITCAP(LOWER(new.endereco));
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_padrao_cpf_endereco
+    BEFORE INSERT OR UPDATE
+    ON db_endereco
+    FOR EACH ROW
+EXECUTE FUNCTION fn_padrao_cep();
+
+SELECT *
+FROM db_endereco
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_atualizar_total_venda()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE db_venda.id_venda = new.id_venda)
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_total_venda
+    AFTER INSERT OR UPDATE OR DELETE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_total_venda();
+
+CREATE OR REPLACE FUNCTION fn_set_preco_unitario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco_unitario IS NULL THEN
+        SELECT preco
+        INTO new.preco_unitario
+        FROM db_produto
+        WHERE id_produto = new.id_produto;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_set_produto_unitario
+    BEFORE INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_set_preco_unitario();
+
+
+SELECT *
+FROM db_produto_venda
+LIMIT 23;
+
+
+
+
+
+
+
+
+
