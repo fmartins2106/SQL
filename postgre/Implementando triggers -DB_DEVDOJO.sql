@@ -811,7 +811,225 @@ SELECT *
 FROM db_produto_venda
 LIMIT 23;
 
+CREATE TABLE db_log_salario
+(
+    id_log_salario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_funcionario INTEGER        NOT NULL,
+    salario_antigo NUMERIC(12, 2) NOT NULL,
+    novo_salario   NUMERIC(12, 2) NOT NULL,
+    data_alteracao TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
+CREATE OR REPLACE FUNCTION fn_log_salario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.salario <> old.salario THEN
+        INSERT INTO db_log_salario(id_funcionario, salario_antigo, novo_salario)
+        VALUES (old.matricula, old.salario, new.salario);
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_log_salario
+    AFTER UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_salario();
+
+SELECT *
+FROM db_log_salario;
+
+SELECT *
+FROM db_funcionario
+LIMIT 2;
+
+UPDATE db_funcionario
+SET salario = 2000
+WHERE matricula = 1003;
+
+CREATE TABLE db_log_preco_alterado
+(
+    id_alteracao_preco INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_produto         INTEGER        NOT NULL,
+    nome_produto       VARCHAR(100)   NOT NULL CHECK (TRIM(nome_produto) <> '' ),
+    preco_antigo       NUMERIC(12, 2) NOT NULL,
+    novo_preco         NUMERIC(12, 2) NOT NULL,
+    data_alteracao     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE FUNCTION fn_log_preco_alterado()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco <> old.preco THEN
+        INSERT INTO db_log_preco_alterado(id_produto, nome_produto, preco_antigo, novo_preco)
+        VALUES (old.id_produto, old.nome_produto, old.preco, new.preco);
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_log_preco_alterado()
+RETURNS TRIGGER AS $$
+    BEGIN
+        IF old.preco <> new.preco then
+            INSERT INTO db_log_preco_alterado(id_produto, nome_produto, preco_antigo, novo_preco)
+            VALUES (old.id_produto,old.nome_produto,old.preco,new.preco);
+        END IF;
+        RETURN new;
+    END;
+
+    $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_log_preco_alterado
+    AFTER UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_preco_alterado();
+
+SELECT *
+FROM db_log_preco_alterado;
+
+UPDATE db_produto
+SET preco = 950.54
+WHERE id_produto = 1003;
+
+SELECT *
+FROM db_produto
+WHERE id_produto = 1003;
+
+CREATE OR REPLACE FUNCTION fn_exclusao_tabelas_log()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido exclusão ou alteração desta tabela.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_exclusao_tabela_log_preco_alterado
+    BEFORE DELETE OR UPDATE
+    ON db_log_preco_alterado
+    FOR EACH ROW
+EXECUTE FUNCTION fn_exclusao_tabelas_log();
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_exclusao_tabela_log_alterar_salario
+    BEFORE DELETE OR UPDATE
+    ON db_log_salario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_exclusao_tabelas_log();
+
+DELETE
+FROM db_log_salario
+WHERE id_log_salario = 2;
+
+UPDATE db_log_salario
+SET novo_salario = 1600
+WHERE id_log_salario = 2;
+
+UPDATE db_funcionario
+SET salario = 2000
+WHERE matricula = 1003;
+
+SELECT *
+FROM db_cliente
+LIMIT 2;
+
+ALTER TABLE db_cliente
+    ADD COLUMN ativo BOOLEAN;
+
+UPDATE db_cliente
+SET ativo = TRUE
+WHERE ativo IS NULL;
+
+CREATE TABLE log_cliente_cancelado
+(
+    id_log_cliente_cancelado INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_cliente               INTEGER      NOT NULL,
+    nome_cliente             VARCHAR(100) NOT NULL CHECK ( TRIM(nome_cliente) <> '' ),
+    data_criacao             TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+alter table log_cliente_cancelado RENAME TO db_log_cliente_cancelado;
+
+DROP TABLE log_cliente_cancelado;
+
+CREATE OR REPLACE FUNCTION fn_cliente_inativo()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_cliente TEXT;
+BEGIN
+    SELECT p.nome
+    INTO v_nome_cliente
+    FROM db_pessoa p
+    WHERE id_pessoa = old.id_pessoa;
+    IF old.ativo = TRUE AND new.ativo = FALSE THEN
+        INSERT INTO log_cliente_cancelado(id_cliente, nome_cliente)
+        VALUES (old.id_cliente, v_nome_cliente);
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_teste()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_cliente TEXT;
+BEGIN
+    SELECT
+        p.nome
+        into v_nome_cliente
+        from db_pessoa p
+    where id_pessoa = old.id_pessoa;
+    IF old.ativo = true and new.ativo = false then
+        INSERT INTO db_log_cliente_cancelado(id_cliente, nome_cliente)
+        VALUES (old.id_cliente,v_nome_cliente);
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_cliente_inativo
+    AFTER UPDATE
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_cliente_inativo();
+
+SELECT *
+FROM db_cliente
+LIMIT 23;
+
+UPDATE db_cliente
+SET ativo = FALSE
+WHERE id_cliente = 102;
+
+SELECT *
+FROM db_cliente
+WHERE id_cliente = 102;
+
+SELECT *
+FROM log_cliente_cancelado;
+
+CREATE OR REPLACE TRIGGER fn_proibir_exclusao
+    BEFORE UPDATE OR DELETE
+    ON log_cliente_cancelado
+    FOR EACH ROW
+EXECUTE FUNCTION fn_exclusao_tabelas_log();
+
+DELETE
+FROM log_cliente_cancelado
+WHERE id_log_cliente_cancelado = 1;
 
 
 
