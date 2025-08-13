@@ -875,16 +875,17 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE FUNCTION fn_log_preco_alterado()
-RETURNS TRIGGER AS $$
-    BEGIN
-        IF old.preco <> new.preco then
-            INSERT INTO db_log_preco_alterado(id_produto, nome_produto, preco_antigo, novo_preco)
-            VALUES (old.id_produto,old.nome_produto,old.preco,new.preco);
-        END IF;
-        RETURN new;
-    END;
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF old.preco <> new.preco THEN
+        INSERT INTO db_log_preco_alterado(id_produto, nome_produto, preco_antigo, novo_preco)
+        VALUES (old.id_produto, old.nome_produto, old.preco, new.preco);
+    END IF;
+    RETURN new;
+END;
 
-    $$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;
 
 
 CREATE OR REPLACE TRIGGER tgr_log_preco_alterado
@@ -956,7 +957,8 @@ CREATE TABLE log_cliente_cancelado
     data_criacao             TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-alter table log_cliente_cancelado RENAME TO db_log_cliente_cancelado;
+ALTER TABLE log_cliente_cancelado
+    RENAME TO db_log_cliente_cancelado;
 
 DROP TABLE log_cliente_cancelado;
 
@@ -985,14 +987,13 @@ $$
 DECLARE
     v_nome_cliente TEXT;
 BEGIN
-    SELECT
-        p.nome
-        into v_nome_cliente
-        from db_pessoa p
-    where id_pessoa = old.id_pessoa;
-    IF old.ativo = true and new.ativo = false then
+    SELECT p.nome
+    INTO v_nome_cliente
+    FROM db_pessoa p
+    WHERE id_pessoa = old.id_pessoa;
+    IF old.ativo = TRUE AND new.ativo = FALSE THEN
         INSERT INTO db_log_cliente_cancelado(id_cliente, nome_cliente)
-        VALUES (old.id_cliente,v_nome_cliente);
+        VALUES (old.id_cliente, v_nome_cliente);
     END IF;
     RETURN new;
 END;
@@ -1033,6 +1034,158 @@ WHERE id_log_cliente_cancelado = 1;
 
 
 
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+
+SELECT *
+FROM db_produto
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_log_atualizar_preco()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco <> old.preco THEN
+        INSERT INTO db_log_preco_alterado(id_produto, nome_produto, preco_antigo, novo_preco)
+        VALUES (old.id_produto, old.nome_produto, old.preco, new.preco);
+    END IF;
+    RETURN new;
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr__log_atualizar_preco
+    AFTER UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_atualizar_preco();
+
+SELECT *
+FROM public.db_cliente
+LIMIT 3;
+
+
+CREATE OR REPLACE FUNCTION fn_log_cliente_inativo()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_cliente TEXT;
+BEGIN
+    SELECT p.nome
+    INTO v_nome_cliente
+    FROM db_pessoa p
+    WHERE p.id_pessoa = old.id_pessoa;
+    IF new.ativo = FALSE AND old.ativo = TRUE THEN
+        INSERT INTO db_log_cliente_cancelado(id_cliente, nome_cliente)
+        VALUES (old.id_cliente, v_nome_cliente);
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_log_cliente_inativo
+    AFTER UPDATE
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_cliente_inativo();
+
+SELECT *
+FROM db_log_cliente_cancelado;
+
+SELECT *
+FROM db_cliente
+LIMIT 2;
+
+
+SELECT *
+FROM db_funcionario
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_data_futura_admissao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_admissao > CURRENT_TIMESTAMP THEN
+        RAISE EXCEPTION 'Proibido cadastrar data de admissão maior que data atual.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_data_futura_admissao
+    BEFORE INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_data_futura_admissao();
+
+INSERT INTO db_funcionario(id_pessoa, data_admissao, data_demissao, salario, id_cargo, id_departamento,
+                           id_nivel_funcionario)
+VALUES (102, '2025-08-13', NULL, 5000, 1, 1, 6);
+
+SELECT *
+FROM db_funcionario
+ORDER BY matricula DESC;
+
+
+INSERT INTO DB_PESSOA (nome, cpf, sexo, email)
+VALUES ('Marta da Silva Rocha', '90100222101', 'F', 'marta.sr@gmail.com');
+
+SELECT *
+FROM db_pessoa
+WHERE id_pessoa = 101;
+
+DELETE
+FROM db_pessoa
+WHERE id_pessoa = 100;
+
+UPDATE db_pessoa
+SET ativo = FALSE
+WHERE id_pessoa = 100;
+
+ALTER TABLE db_pessoa
+    ALTER COLUMN ativo SET DEFAULT TRUE;
+
+ALTER TABLE db_funcionario
+    ALTER COLUMN ativo SET DEFAULT TRUE;
+
+UPDATE db_funcionario
+SET ativo = TRUE
+WHERE matricula = 1024;
+
+
+CREATE OR REPLACE FUNCTION fn_demissao_salario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF old.ativo = FALSE AND old.data_demissao IS NOT NULL THEN
+        RAISE EXCEPTION 'Proibido fazer alteração em funcionário com cadastro inativo.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_alterar_cadastro_funcionario_inativo
+    BEFORE UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_demissao_salario();
+
+
+select * from db_funcionario where ativo = false;
+
+
+update db_funcionario set salario = 2000 where matricula = 1000;
+
+update db_funcionario set data_demissao = '2025-08-13' where matricula = 1008;
+
+SELECT *
+FROM db_funcionario
+where matricula = 1008;
 
 
 
