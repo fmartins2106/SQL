@@ -1176,17 +1176,75 @@ CREATE OR REPLACE TRIGGER tgr_proibido_alterar_cadastro_funcionario_inativo
 EXECUTE FUNCTION fn_demissao_salario();
 
 
-select * from db_funcionario where ativo = false;
+SELECT *
+FROM db_funcionario
+WHERE ativo = FALSE;
 
 
-update db_funcionario set salario = 2000 where matricula = 1000;
+UPDATE db_funcionario
+SET salario = 2000
+WHERE matricula = 1000;
 
-update db_funcionario set data_demissao = '2025-08-13' where matricula = 1008;
+UPDATE db_funcionario
+SET data_demissao = '2025-08-13'
+WHERE matricula = 1008;
 
 SELECT *
 FROM db_funcionario
-where matricula = 1008;
+WHERE matricula = 1008;
+
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND table_schema NOT IN ('pg_catalog', 'information_schema');
+
+DROP FUNCTION fn_bloquear_truncate();
+DROP EVENT TRIGGER trg_bloquear_drop;
+
+
+CREATE ROLE fmartins_adm WITH LOGIN SUPERUSER PASSWORD 'masterkey';
 
 
 
+SELECT "current_user"();
 
+SET ROLE fmartins;
+
+drop table db_pessoa;
+
+DROP TABLE db_pessoa;
+CREATE ROLE fmartins_adm WITH LOGIN SUPERUSER PASSWORD 'masterkey';
+ALTER TABLE db_pessoa
+    OWNER TO fmartins_adm;
+
+
+ALTER TABLE db_pessoa
+    OWNER TO admin_role;
+ALTER TABLE db_funcionario
+    OWNER TO admin_role;
+ALTER TABLE db_cliente
+    OWNER TO admin_role;
+
+
+SELECT rolname, rolsuper
+FROM pg_roles;
+
+SELECT tablename, tableowner
+FROM pg_tables
+WHERE tablename IN ('db_test');
+
+create table db_test(
+    id SERIAL PRIMARY KEY ,
+    nome varchar(100),
+    sobrenome varchar(100)
+);
+SELECT * from db_test;
+
+set role fmartins;
+
+SELECT "current_user"();
+
+DROP TABLE db_test;
+
+ALTER TABLE db_test OWNER TO fmartins_adm;
