@@ -1211,7 +1211,7 @@ SELECT "current_user"();
 
 SET ROLE fmartins;
 
-drop table db_pessoa;
+DROP TABLE db_pessoa;
 
 DROP TABLE db_pessoa;
 CREATE ROLE fmartins_adm WITH LOGIN SUPERUSER PASSWORD 'masterkey';
@@ -1234,17 +1234,110 @@ SELECT tablename, tableowner
 FROM pg_tables
 WHERE tablename IN ('db_test');
 
-create table db_test(
-    id SERIAL PRIMARY KEY ,
-    nome varchar(100),
-    sobrenome varchar(100)
+CREATE TABLE db_test
+(
+    id        SERIAL PRIMARY KEY,
+    nome      VARCHAR(100),
+    sobrenome VARCHAR(100)
 );
-SELECT * from db_test;
+SELECT *
+FROM db_test;
 
-set role fmartins;
+SET ROLE fmartins;
 
 SELECT "current_user"();
 
 DROP TABLE db_test;
 
-ALTER TABLE db_test OWNER TO fmartins_adm;
+ALTER TABLE db_test
+    OWNER TO fmartins_adm;
+
+DROP TABLE db_estoque;
+CREATE TABLE db_estoque
+(
+    id_produto_estoque INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_produto         INTEGER,
+    quantidade         INTEGER NOT NULL,
+    CONSTRAINT fk_id_produto_estoque FOREIGN KEY (id_produto) REFERENCES db_produto (id_produto)
+);
+
+CREATE OR REPLACE FUNCTION fn_baixar_db_estoque()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_estoque
+    SET quantidade = quantidade - new.quantidade
+    WHERE id_produto = new.id_produto;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_baixar_estoque
+    AFTER INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_baixar_db_estoque();
+
+SELECT *
+FROM db_estoque;
+SELECT *
+FROM db_produto
+LIMIT 5;
+
+SELECT *
+FROM db_produto_venda
+LIMIT 3;
+
+INSERT INTO db_estoque(id_produto, quantidade)
+VALUES (1003, 1000),
+       (1004, 1000),
+       (1005, 1000),
+       (1008, 1000);
+
+SELECT *
+FROM db_produto
+LIMIT 2;
+SELECT *
+FROM db_produto_venda
+WHERE id_venda = 200;
+
+SELECT *
+FROM db_venda
+ORDER BY id_venda DESC;
+
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade)
+VALUES (200, 1003, 589.90, 1);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade)
+VALUES (199, 1004, 999.00, 2);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade)
+VALUES (198, 1004, 1999.00, 3);
+INSERT INTO DB_PRODUTO_VENDA (id_venda, id_produto, preco_unitario, quantidade)
+VALUES (197, 1008, 1999.00, 4);
+
+INSERT INTO DB_VENDA (documento, id_cliente, total)
+VALUES ('VENDA12002', 101, 269.90);
+INSERT INTO DB_VENDA (documento, id_cliente, total)
+VALUES ('VENDA12003', 102, 999.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total)
+VALUES ('VENDA12004', 103, 3899.00);
+INSERT INTO DB_VENDA (documento, id_cliente, total)
+VALUES ('VENDA122ed5', 104, 1149.80);
+
+SELECT *
+FROM db_venda
+ORDER BY id_venda DESC;
+
+CREATE OR REPLACE FUNCTION fn_iniciar_venda_ativa()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.ativo = TRUE;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER trg_iniciar_venda_ativo_true
+    BEFORE INSERT
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_iniciar_venda_ativa();

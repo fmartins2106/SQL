@@ -1,4 +1,40 @@
 SELECT "current_user"(); --Verificar qual usuario esta logado no banco de dados;
+SELECT "current_user"();
+select "current_user"();
+select "current_user"();
+select "current_user"();
+SELECT "current_user"();
+select "current_user"();
+SELECT "current_user"();
+SELECT "current_user"();
+
+SET ROLE usuario_test;
+SET ROLE fmartins_adm;
+SET ROLE fmartins;
+SELECT "current_user"();
+SET ROLE fmartins_adm;
+select "current_user"();
+set ROLE fmartins_adm;
+set ROLE usuario_test;
+SELECT "current_user"();
+
+-- verificar donos das tabelas;
+SELECT
+    tablename,tableowner
+FROM pg_tables order by tableowner;
+
+select tablename,tableowner
+FROM pg_tables ORDER BY tableowner;
+
+SELECT tablename,tableowner
+from pg_tables ORDER BY tablename;
+select * from pg_roles;
+select * from pg_roles;
+select * from pg_tables;
+
+select * from db_pessoa;
+
+
 
 SET ROLE fmartins; -- definir usuario;
 
@@ -6,8 +42,14 @@ CREATE ROLE fmartins_adm WITH LOGIN SUPERUSER PASSWORD 'masterkey'; --criar usua
 
 CREATE ROLE usuario_test WITH LOGIN PASSWORD '123';
 
+SET ROLE fmartins;
+SET ROLE usuario_test;
+
+
+
 
 drop TABLE db_test;
+
 SELECT * from db_test;
 create table db_test(
     id SERIAL PRIMARY KEY ,
@@ -37,10 +79,7 @@ $$
     END;
 $$;
 
--- verificar donos das tabelas;
-SELECT
-    tablename,tableowner
-FROM pg_tables order by tableowner;
+
 
 DO $$
     DECLARE
