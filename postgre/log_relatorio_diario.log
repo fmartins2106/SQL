@@ -1,1 +1,12 @@
-CALL
+psql:/home/fmartins/Documentos/Estudos/Banco de dados script/postgre/rotina_relatorio_diario_vendas.sql:1: ERROR:  duplicate key value violates unique constraint "db_relatorio_diario_vendas_id_venda_key"
+DETALHE:  Key (id_venda)=(197) already exists.
+CONTEXTO:  SQL statement "INSERT INTO db_relatorio_diario_vendas(id_venda, data_venda, total)
+    SELECT
+        id_venda,
+        data_venda::DATE,
+        SUM(total) AS total
+    FROM db_venda
+    WHERE data_venda >= CURRENT_DATE - INTERVAL '1 day'
+      AND data_venda < CURRENT_DATE
+    GROUP BY id_venda, data_venda::DATE"
+PL/pgSQL function sp_relatorio_vendas_diaria() line 3 at SQL statement
