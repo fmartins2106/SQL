@@ -179,7 +179,6 @@ CREATE OR REPLACE TRIGGER trg_proibir_excluir_linha
     FOR EACH ROW
 EXECUTE FUNCTION fn_proibir_excluir_linha();
 
-
 SELECT "current_user"();
 SET ROLE fmartins;
 
@@ -291,10 +290,8 @@ GRANT USAGE ON SCHEMA public TO usuario_test;
 GRANT USAGE ON SCHEMA public TO usuaio_test;
 GRANT USAGE ON SCHEMA public TO usuario_test;
 GRANT USAGE ON SCHEMA public TO usuario_test;
-GRANT USAGE ON SCHEMA public TO usuario_test;
 
 -- 4. Dar permissão em todas as tabelas já existentes
-GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
@@ -396,18 +393,167 @@ CREATE EVENT TRIGGER tgr_log_create_table
 EXECUTE FUNCTION fn_log_create_table();
 
 
+SELECT "current_user"();
+SET ROLE fmartins_adm;
+
+CREATE ROLE fmartins02 WITH LOGIN PASSWORD '123123';
+CREATE ROLE fmartins02 WITH LOGIN SUPERUSER PASSWORD '123123';
+CREATE ROLE fmartins WITH LOGIN SUPERUSER PASSWORD '123123';
+CREATE ROLE fmartins WITH LOGIN PASSWORD '123123';
+
+CREATE ROLE fmartins WITH LOGIN PASSWORD '123123';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco TO usuario_test;
+
+
+GRANT CONNECT ON DATABASE meu_banco TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco02 TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco3 TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE meu_banco03 TO usuario_test;
+
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+
+GRANT CONNECT ON DATABASE banco02 TO usuario_test;
+GRANT CONNECT ON DATABASE banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE banco03 TO usuario_test;
+GRANT CONNECT ON DATABASE banco04 TO usuario_test;
+
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+
+GRANT CONNECT ON DATABASE dbTest TO usuario_test;
+GRANT CONNECT ON DATABASE banco01 TO usuario_test;
+
+
+GRANT CONNECT ON SCHEMA TO usuario_test;
+GRANT CONNECT ON SCHEMA TO usuario_test;
+GRANT CONNECT ON SCHEMA TO usuario_test;
+GRANT CONNECT ON SCHEMA TO usuario_test;
+GRANT CONNECT ON SCHEMA TO usuario_test;
+GRANT CONNECT ON DATABASE bancoo1 TO usuario_test;
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA to usuario_test;
+
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+GRANT CONNECT ON DATABASE dbMedico TO usuario_test;
+GRANT CONNECT ON SCHEMA PUBLIC TO usuario_test;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO usuaro_test;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE OR REPLACE FUNCTION fn_proibir_excluir_tabela()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir tabela do banco de dados. Consulte o DBA.';
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloqueio_exclusao_tabela
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
 
 
 
+CREATE TABLE db_log_create_table
+(
+    usuario            TEXT NOT NULL,
+    comando            TEXT NOT NULL,
+    data_hora_execucao TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE TABLE db_log_create_table
+(
+    usuario       TEXT NOT NULL,
+    comando       TEXT NOT NULL,
+    data_execucao TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE db_log_create_table
+(
+    usuario       TEXT NOT NULL,
+    comando       TEXT NOT NULL,
+    data_execucao TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_log_create_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_table(usuario, comando)
+    VALUES ("current_user"(), tg_tag);
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_db_log_create_table
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION fn_log_create_table();
 
 
 
+SELECT *
+FROM db_log_create_table;
+CREATE OR REPLACE FUNCTION fn_log_create_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_table(usuario, comando)
+    VALUES ("current_user"(), tg_tag);
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_log_create_table
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION fn_log_create_table();
 
 
+CREATE OR REPLACE FUNCTION fn_proibir_excluir_coluna()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir coluna. Consulte o DBA.';
+END;
+$$ LANGUAGE plpgsql;
 
 
+CREATE EVENT TRIGGER tgr_proibido_excluir_coluna
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_proibir_excluir_coluna();
 
+CREATE EVENT TRIGGER tgr_proibido_excluir_coluna
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_log_create_table();
 
+CREATE EVENT TRIGGER tgr_proibido_alter_table
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_proibir_excluir_coluna();
 
 
 
