@@ -556,6 +556,250 @@ CREATE EVENT TRIGGER tgr_proibido_alter_table
 EXECUTE FUNCTION fn_proibir_excluir_coluna();
 
 
+SELECT "current_user"();
+SET ROLE fmartins_adm;
 
+CREATE ROLE fmartins_adm_adm WITH LOGIN PASSWORD '123123';
+CREATE ROLE fmartins_adm WITH LOGIN SUPERUSER PASSWORD '123123';
+
+GRANT CONNECT ON DATABASE dbescola TO fmartins02;
+GRANT CONNECT ON DATABASE dbescola TO fmartins02;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+GRANT CONNECT ON SCHEMA PUBLIC TO fmartins;
+
+GRANT CONNECT ON DATABASE dbMedico TO usuario_test;
+GRANT CONNECT ON SCHEMA PUBLIC TO usuario_test;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO usuaro_test;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+GRANT CONNECT ON DATABASE dbescola TO fmartins;
+
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+GRANT INSERT, DELETE, UPDATE, SELECT ON ALL TABLES IN SCHEMA public TO fmartins;
+
+
+SELECT *
+FROM db_venda;
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido operação drop em tabelas.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_drop_table
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+
+CREATE TABLE db_log_create_table
+(
+    usuario       TEXT NOT NULL,
+    comando       TEXT NOT NULL,
+    data_execucao TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_log_create_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_table(usuario, comando)
+    VALUES ("current_user"(), tg_tag);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_log_create_table
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION fn_log_create_table();
+
+CREATE OR REPLACE FUNCTION fn_proibido_remover_coluna()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido ALTER TABLE com seu usuario.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_proibido_alter_tabela
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_proibido_remover_coluna();
+
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+REVOKE ALL PRIVILEGES ON DATABASE postgres to usuario;
+REVOKE ALL PRIVILEGES ON DATABASE postgres to usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public to usuario_test;
+
+ALTER ROLE usuario_test WITH NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT;
+
+
+SET ROLE fmartins_adm;
+SELECT "current_user"();
+DROP TABLE db_test;
+CREATE TABLE db_test03
+(
+    nome TEXT NOT NULL
+
+);
+
+ALTER TABLE db_test
+    ADD COLUMN nome TEXT NOT NULL;
+
+SELECT *
+FROM db_test;
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOINHERIT NOCREATEDB;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+
+
+CREATE OR REPLACE FUNCTION fn_baixar_estoque()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_estoque
+    SET quantidade = old.quantidade - new.quantidade
+    WHERE id_produto = new.id_produto;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_baixar_estoque
+    BEFORE UPDATE
+    ON db_produto_venda
+EXECUTE FUNCTION fn_baixar_estoque();
+
+
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+SELECT *
+FROM db_estoque
+LIMIT 3;
+
+SELECT *
+FROM db_produto_venda
+LIMIT 3;
+
+SELECT *
+FROM db_venda
+LIMIT 3;
+
+
+CREATE OR REPLACE FUNCTION fn_atualizar_total_vendas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE id_venda = new.id_venda)
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_total
+    AFTER INSERT OR UPDATE OR DELETE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_total_vendas();
+
+
+CREATE OR REPLACE FUNCTION fn_inserir_preco_unitario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco_unitario IS NULL THEN
+        SELECT preco
+        INTO new.preco_unitario
+        FROM db_produto
+        WHERE id_produto = new.id_produto;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_inserir_preco_unitario
+    BEFORE INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_inserir_preco_unitario();
+
+
+SELECT *
+FROM db_produto
+LIMIT 3;
+
+SET ROLE fmartins_adm;
 
 
