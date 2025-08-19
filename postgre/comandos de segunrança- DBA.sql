@@ -803,3 +803,184 @@ LIMIT 3;
 SET ROLE fmartins_adm;
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+
+
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOINHERIT NOCREATEDB;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+
+ALTER ROLE usuario_test WITH NOSUPERUSER NOCREATEROLE NOCREATEDB NOINHERIT;
+
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+SELECT *
+FROM db_produto_venda
+LIMIT 23;
+
+CREATE OR REPLACE FUNCTION fn_atualizar_total_vendas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE id_venda = new.id_venda)
+    WHERE id_venda = NEW.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_total_vendas
+    AFTER INSERT OR UPDATE OR DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_total_vendas();
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_total_vendas
+    AFTER UPDATE OR INSERT OR DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_total_vendas();
+
+
+CREATE OR REPLACE FUNCTION fn_atualizar_preco_unitario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    SELECT preco
+    INTO new.preco_unitario
+    FROM db_produto
+    WHERE id_produto = new.id_produto;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_triger_atualizar_preco_unitario
+    AFTER INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_preco_unitario();
+
+SELECT *
+FROM db_produto_venda
+LIMIT 3;
+SELECT *
+FROM db_produto
+LIMIT 2;
+
+CREATE OR REPLACE FUNCTION fn_validar_preco()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 50 OR new.preco > 10000 THEN
+        RAISE EXCEPTION 'Erro, preço do produto não pode ser menor que 50 ou maior que R$10.000,00';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_validar_preco_min_max
+    BEFORE INSERT
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validar_preco();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_exclusao_cliente()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido deletar cadastro do banco de dados.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloqueando_exclusao_cliente
+    BEFORE DELETE
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_exclusao_cliente();
+
+
+SET ROLE fmartins;
+SELECT "current_user"();
+
+DELETE
+FROM db_cliente
+WHERE id_cliente = 104;
+
+SELECT *
+FROM db_cliente
+WHERE id_cliente = 104;
+
+SELECT *
+FROM db_cliente
+LIMIT 32;
+
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido dar drop table. Converse com o DBA.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_event_trigger_bloquear_drop_table
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+
+
