@@ -983,4 +983,134 @@ CREATE EVENT TRIGGER tgr_event_trigger_bloquear_drop_table
 EXECUTE FUNCTION fn_bloquear_drop_table();
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT DELETE, SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOINHERIT NOSUPERUSER;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND table_schema NOT IN ('pg_component', 'schema information')
+ORDER BY table_name, table_schema;
+
+SELECT *
+FROM db_venda
+LIMIT 32;
+
+SELECT *
+FROM db_diretoria
+LIMIT 3;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_excluir_dados_direitoria()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido exclusão de dados da tabela diretoria.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_excluir_dados_diretoria
+    BEFORE DELETE
+    ON db_diretoria
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_excluir_dados_direitoria();
+
+
+SELECT "current_user"();
+ALTER TABLE db_diretoria
+    DROP COLUMN ativo;
+SET ROLE fmartins;
+
+ALTER TABLE db_diretoria
+    ADD COLUMN test BOOLEAN;
+
+ALTER TABLE db_diretoria
+    DROP COLUMN test;
+
+SELECT *
+FROM db_diretoria
+LIMIT 3;
+
+UPDATE db_diretoria
+SET ativo = TRUE
+WHERE ativo IS NULL;
+
+
+SELECT *
+FROM db_funcionario
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_data_admissa_futura()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_admissao > CURRENT_DATE THEN
+        RAISE EXCEPTION 'Erro, data de admissão não pode ser maior que a data de hoje.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_data_admissao_futura
+    BEFORE INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_data_admissa_futura();
+
+INSERT INTO DB_FUNCIONARIO
+(id_pessoa, data_admissao, data_demissao, salario, id_cargo, id_departamento, id_nivel_funcionario)
+VALUES (1, '2025-08-20', NULL, 2500.00, 1, 1, 3);
+
+SELECT *
+FROM db_funcionario
+ORDER BY matricula DESC
+LIMIT 10
+;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_alteracao_cadastro_inativo()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.ativo = FALSE THEN
+        RAISE EXCEPTION 'Proibido alterar dado de cadastro inativo';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_cadastro_inativo
+    BEFORE UPDATE OR DELETE OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_alteracao_cadastro_inativo();
+
+SELECT * from db_funcionario where ativo = false;
+
+UPDATE db_funcionario SET salario = 2000 where matricula = 1000;
+
+DROP EVENT TRIGGER tgr_proibido_excluir_coluna;
+
+
+
 
