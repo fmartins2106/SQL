@@ -1087,7 +1087,6 @@ ORDER BY matricula DESC
 LIMIT 10
 ;
 
-
 CREATE OR REPLACE FUNCTION fn_proibido_alteracao_cadastro_inativo()
     RETURNS TRIGGER AS
 $$
@@ -1105,12 +1104,168 @@ CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_cadastro_inativo
     FOR EACH ROW
 EXECUTE FUNCTION fn_proibido_alteracao_cadastro_inativo();
 
-SELECT * from db_funcionario where ativo = false;
+SELECT *
+FROM db_funcionario
+WHERE ativo = FALSE;
 
-UPDATE db_funcionario SET salario = 2000 where matricula = 1000;
+UPDATE db_funcionario
+SET salario = 2000
+WHERE matricula = 1000;
 
-DROP EVENT TRIGGER tgr_proibido_excluir_coluna;
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '1212212';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+
+CREATE TABLE db_log_alteracao_salarial
+(
+    id_log_alt_salario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    usuario            TEXT                    NOT NULL,
+    id_funcionario     INTEGER                 NOT NULL,
+    salario_antigo     NUMERIC(12, 2),
+    novo_salario       NUMERIC(12, 2),
+    data_alteracao     TIMESTAMP DEFAULT NOW() NOT NULL,
+    CONSTRAINT fk_id_funcionario FOREIGN KEY (id_funcionario) REFERENCES db_funcionario (matricula)
+);
+
+CREATE OR REPLACE FUNCTION fn_log_alteracao_salario()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_alteracao_salarial(usuario, id_funcionario, salario_antigo, novo_salario)
+    VALUES (CURRENT_USER, old.id_funcionario, old.salario_antigo, new.novo_salario);
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_log_tabela_alteracao_salarial
+    AFTER UPDATE OF salario
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_alteracao_salario();
+
+SELECT *
+FROM db_venda
+LIMIT 3;
+
+
+CREATE OR REPLACE FUNCTION fn_inserir_total_automatico()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    total NUMERIC(12, 2);
+BEGIN
+    SELECT COALESCE(SUM(NEW.preco_unitario * NEW.quantidade), 0)
+    INTO total
+    FROM db_produto_venda
+    WHERE id_venda = new.id_venda;
+    UPDATE db_venda
+    SET total = total
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_fn_inserir_valor_total_db_vendas
+    AFTER UPDATE OR INSERT
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_inserir_total_automatico();
+
+CREATE OR REPLACE FUNCTION fn_add_preco_unitario_db_produto_venda()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_preco NUMERIC(12, 2);
+BEGIN
+    SELECT preco
+    INTO v_preco
+    FROM db_produto
+    WHERE id_produto = new.id_produto;
+    new.preco_unitario = v_preco;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_add_preco_unitario_db_produto_venda
+    BEFORE UPDATE OR INSERT
+    ON db_produto_venda
+EXECUTE FUNCTION fn_add_preco_unitario_db_produto_venda();
+
+
+SELECT *
+FROM db_produto_venda
+LIMIT 3;
+
+SELECT *
+FROM db_produto
+LIMIT 3;
+
+CREATE OR REPLACE FUNCTION fn_bloquear_venda_sem_produto()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM db_produto_venda WHERE id_venda = new.id_venda) THEN
+        RAISE EXCEPTION 'Não é possivel confirmar a venda % sem produtos.',new.venda;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_venda_sem_produto
+    BEFORE INSERT
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_venda_sem_produto();
+
+
+SELECT table_schema,
+       table_name
+FROM information_schema.tables
+WHERE table_type = 'BASE TABLE'
+  AND TABLE_SCHEMA NOT IN ('pg_catalog', 'information_schema');
+
+
+SELECT *
+FROM db_logradouro
+LIMIT 2;
+
+ALTER TABLE db_logradouro
+    ADD COLUMN ativo BOOLEAN;
+
+CREATE OR REPLACE FUNCTION fn_inativar_logradouro()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir do linha do banco de dados.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_inativar_logradouro
+    BEFORE DELETE
+    ON db_logradouro
+    FOR EACH ROW
+EXECUTE FUNCTION fn_inativar_logradouro();
+
+delete from db_logradouro where id_logradouro = 1;
+
+SET ROLE usuario_test;
+
+SELECT "current_user"();
 
 
