@@ -1160,6 +1160,25 @@ SELECT *
 FROM db_venda
 LIMIT 3;
 
+CREATE OR REPLACE FUNCTION fn_inserir_total_automatico()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE id_venda = new.id_venda)
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_inserir_total_automatico
+    AFTER UPDATE OR DELETE OR INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_inserir_preco_unitario();
+
 
 CREATE OR REPLACE FUNCTION fn_inserir_total_automatico()
     RETURNS TRIGGER AS
@@ -1262,10 +1281,207 @@ CREATE OR REPLACE TRIGGER tgr_inativar_logradouro
     FOR EACH ROW
 EXECUTE FUNCTION fn_inativar_logradouro();
 
-delete from db_logradouro where id_logradouro = 1;
+DELETE
+FROM db_logradouro
+WHERE id_logradouro = 1;
 
 SET ROLE usuario_test;
 
 SELECT "current_user"();
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE OR REPLACE FUNCTION fn_set_atualizacao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.ultima_atualizacao := NOW();
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_ultima_atualizacao
+    BEFORE INSERT OR UPDATE
+    ON db_pessoa
+    FOR EACH ROW
+EXECUTE FUNCTION fn_set_atualizacao();
+
+
+CREATE OR REPLACE FUNCTION fn_calcular_total_vendas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE id_venda = new.id_venda)
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_calcular_total
+    AFTER UPDATE OR INSERT
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_calcular_total_vendas();
+
+CREATE OR REPLACE FUNCTION fn_calcular_total_vendas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    UPDATE db_venda
+    SET total = (SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+                 FROM db_produto_venda
+                 WHERE db_venda.id_venda = new.id_venda)
+    WHERE id_venda = new.id_venda;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_calcular_total_vendas
+    AFTER UPDATE OR INSERT OR DELETE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_calcular_total_vendas();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_demissao_salario_maior_10000()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_demissao IS NOT NULL AND new.salario >= 10000 THEN
+        RAISE EXCEPTION 'Demissão não autorizada. Tratar com Diretoria da área.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_demissao_salario_maior_10000
+    BEFORE UPDATE OF data_demissao
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_demissao_salario_maior_10000();
+
+
+SELECT *
+FROM db_funcionario
+WHERE salario >= 10000;
+
+UPDATE db_funcionario
+SET data_demissao = '2025-08-22'
+WHERE matricula = 1018;
+
+CREATE TABLE db_log_demissao
+(
+    id_demissao      INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    matricula        INTEGER NOT NULL,
+    nome_funcionario TEXT    NOT NULL,
+    data_admissao    DATE    NOT NULL,
+    data_demissao    DATE    NOT NULL,
+    usuario          TEXT    NOT NULL,
+    data_execucao    TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_log_demissao()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome
+    FROM db_pessoa
+    WHERE id_pessoa = new.id_pessoa;
+    INSERT INTO db_log_demissao(matricula, nome_funcionario, data_admissao, data_demissao, usuario)
+    VALUES (old.matricula, v_nome, old.data_admissao, new.data_demissao, "current_user"());
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_log_demissao()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome
+    FROM db_pessoa
+    WHERE id_pessoa = new.id_pessoa;
+    INSERT INTO db_log_demissao(matricula, nome_funcionario, data_admissao, data_demissao, usuario)
+    VALUES (old.matricula, v_nome, old.data_admissao, new.data_demissao, CURRENT_USER);
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE OR REPLACE TRIGGER tgr_log_demissao
+    AFTER UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_demissao();
+
+
+SELECT *
+FROM db_funcionario
+ORDER BY db_funcionario.matricula DESC;
+
+UPDATE db_funcionario
+SET data_demissao = '2025-08-22'
+WHERE matricula = 1020;
+
+SELECT *
+FROM db_log_demissao;
+
+SELECT *
+FROM db_funcionario
+WHERE matricula = 1020;
+
+
+
+SELECT "current_user"();
+
+
+
+SELECT *
+FROM db_funcionario
+LIMIT 3;
+
+SELECT *
+FROM db_produto_venda
+LIMIT 3;
+
+
+
+SELECT *
+FROM db_pessoa
+LIMIT 3;
+
+
+
+
+
+
+
+
+
+
+
 
 
