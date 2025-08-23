@@ -1180,6 +1180,7 @@ CREATE OR REPLACE TRIGGER tgr_inserir_total_automatico
 EXECUTE FUNCTION fn_inserir_preco_unitario();
 
 
+
 CREATE OR REPLACE FUNCTION fn_inserir_total_automatico()
     RETURNS TRIGGER AS
 $$
@@ -1475,6 +1476,159 @@ LIMIT 3;
 
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOINHERIT NOSUPERUSER;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+SELECT "current_user"();
+
+SET ROLE fmartins_adm;
+
+CREATE FUNCTION fn_atualizar_dados()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (tg_op = 'UPDATE' OR tg_op = 'DELETE') AND OLD.ativo = FALSE THEN
+        RAISE EXCEPTION 'ERro: operação não permitida em cadastro inativo.';
+    END IF;
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE FUNCTION fn_atualizar_dados()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (tg_op = 'UPDATE' OR 'tg_op' = 'DELETE') AND OLD.ativo = FALSE THEN
+        RAISE EXCEPTION 'Erro: operação não permitida em cadastro inativo';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_atualizar_dados_cad_cancelado()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (tg_op = 'DELETE' OR tg_op = 'UPDATE') AND OLD.ATIVO = FALSE THEN
+        RAISE EXCEPTION 'Erro, não permitido cadastro inativo.';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_dados_db_pessoa
+    BEFORE DELETE OR INSERT OR UPDATE
+    ON db_pessoa
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_dados();
+
+
+CREATE OR REPLACE FUNCTION fn_calcular_total_vendas()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_total_vendas NUMERIC(12, 2);
+    v_id_venda     INT;
+BEGIN
+    IF (tg_op = 'DELETE') THEN
+        v_id_venda := old.id_venda;
+    ELSE
+        v_id_venda := new.id_venda;
+    END IF;
+    SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+    INTO v_total_vendas
+    FROM db_produto_venda
+    WHERE id_venda = v_id_venda;
+
+    UPDATE db_venda
+    SET total = v_total_vendas
+    WHERE id_venda = v_id_venda;
+    RETURN COALESCE(new, old);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_calcular_total_vendas
+    AFTER UPDATE OR INSERT OR DELETE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_calcular_total_vendas();
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_demissao_salario_maior_10000()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF old.data_demissao IS NULL AND new.data_demissao IS NOT NULL THEN
+        IF new.salario >= 10000 THEN
+            RAISE EXCEPTION 'Proibido demissão. Salário acima de R$10.000 - Converser com a diretoria.';
+        END IF;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_demissao_salario_maior_10000
+    BEFORE UPDATE OF data_demissao
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_demissao_salario_maior_10000();
+
+
+CREATE OR REPLACE FUNCTION fn_salario_minimo()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.salario < 1510 THEN
+        RAISE EXCEPTION 'Erro, Salário não pode ser menor que salário mínimo vigente de R$1510.00';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_salario_minimo
+    BEFORE UPDATE OF salario OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_salario_minimo();
+
+
+
+CREATE OR REPLACE FUNCTION fn_calcular_total_db_venda()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_total_vendas NUMERIC(12, 2);
+    v_id_venda     INTEGER;
+BEGIN
+    IF (tg_op = 'DELETE') THEN
+        old.id_venda = v_id_venda;
+    ELSE
+        v_id_venda = new.id_venda;
+    END IF;
+
+    SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+    INTO v_total_vendas
+    FROM db_produto_venda
+    WHERE id_venda = v_id_venda;
+
+    UPDATE db_venda
+    SET total = v_total_vendas
+    WHERE id_venda = v_id_venda;
+    RETURN COALESCE(new, old);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_calcular_total_db_venda
+    AFTER INSERT OR DELETE OR UPDATE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_calcular_total_vendas();
 
 
 
