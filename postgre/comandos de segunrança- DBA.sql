@@ -1631,9 +1631,219 @@ CREATE OR REPLACE TRIGGER tgr_calcular_total_db_venda
 EXECUTE FUNCTION fn_calcular_total_vendas();
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE OR REPLACE FUNCTION fn_set_atualizacao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.data_atualizacao = NOW();
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_set_atualizacao_tabela_db_cliente
+    BEFORE UPDATE
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_set_atualizacao();
+
+CREATE OR REPLACE FUNCTION fn_set_atualizacao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.data_atualizacao = NOW();
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_atualizacao_tabela_db_cliente
+    BEFORE UPDATE
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_set_atualizacao();
+
+CREATE OR REPLACE FUNCTION fn_atualizar_valor_total_db_venda()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_total_venda NUMERIC(12, 2);
+    v_id_venda    INTEGER;
+BEGIN
+    IF (tg_op = 'DELETE') THEN
+        v_id_venda = old.id_venda;
+    ELSE
+        v_id_venda = new.id_venda;
+    END IF;
+
+    SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+    INTO v_total_venda
+    FROM db_produto_venda
+    WHERE id_venda = v_id_venda;
+
+    UPDATE db_venda
+    SET total = v_total_venda
+    WHERE id_venda = v_id_venda;
+
+    RETURN COALESCE(new, old);
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_demissao_salario_acima_10000()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.salario >= 10000 AND new.data_demissao IS NOT NULL THEN
+        RAISE EXCEPTION 'Erro. proibido demissão de funcionário com salário maior que R$10.000 - Converse com a diretoria';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_proibido_demissao_salario_acima_10000
+    BEFORE UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_demissao_salario_acima_10000();
+
+CREATE TABLE db_log_alteracao_salario
+(
+    id_altecao_salario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    matricula          INTEGER        NOT NULL,
+    nome_funcionario   TEXT           NOT NULL,
+    salario_antigo     NUMERIC(12, 2) NOT NULL,
+    salario_novo       NUMERIC(12, 2) NOT NULL,
+    usuario            TEXT           NOT NULL,
+    data_alteracao     TIMESTAMP DEFAULT NOW()
+);
+
+
+CREATE OR REPLACE FUNCTION fn_alteracao_salario()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_funcionario TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome_funcionario
+    FROM db_pessoa
+    WHERE id_pessoa = new.id_pessoa;
+
+    -- Só loga se o salário realmente mudou
+    IF TG_OP = 'UPDATE' AND OLD.salario <> NEW.salario THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario)
+        VALUES (OLD.matricula, v_nome_funcionario, OLD.salario, NEW.salario, CURRENT_USER);
+    END IF;
+
+    -- Se for INSERT, guarda salário inicial
+    IF TG_OP = 'INSERT' THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario)
+        VALUES (NEW.matricula, v_nome_funcionario, 0, NEW.salario, CURRENT_USER);
+    END IF;
+    RETURN new;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_alteracao_salario
+    AFTER UPDATE OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_alteracao_salario();
 
 
 
+CREATE OR REPLACE FUNCTION fn_alteracao_salario()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome
+    FROM db_pessoa
+    WHERE id_pessoa = new.id_pessoa;
+
+    IF (tg_op = 'UPDATE') AND old.salario <> new.salario THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario)
+        VALUES (old.matricula, v_nome, old.salario, new.salario, CURRENT_USER);
+    END IF;
+
+    IF (tg_op = 'INSERT') THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario)
+        VALUES (old.matricula, v_nome, 0, new.salario, CURRENT_USER);
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_salario
+    BEFORE INSERT OR UPDATE
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_salario;
+
+
+CREATE OR REPLACE FUNCTION fn_validar_preco_produto()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 50 OR new.preco > 10000 THEN
+        RAISE EXCEPTION 'Erro. Preço não pode ser menor que R$50,00 ou maior que R$10.000';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_validar_preco_produto
+    BEFORE INSERT OR UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validar_preco_produto();
+
+
+CREATE OR REPLACE FUNCTION fn_data_criacao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    new.data_criacao = NOW();
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_data_criacao
+    BEFORE INSERT
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_data_criacao();
+
+
+
+SELECT *
+FROM db_produto
+LIMIT 2;
+
+
+
+CREATE FUNCTION fn_atualizar_dados()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (tg_op = 'UPDATE' OR tg_op = 'DELETE') AND OLD.ativo = FALSE THEN
+        RAISE EXCEPTION 'ERro: operação não permitida em cadastro inativo.';
+    END IF;
+    RETURN COALESCE(NEW, OLD);
+END;
+$$ LANGUAGE plpgsql;
 
 
 
