@@ -1784,12 +1784,62 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-
 CREATE OR REPLACE TRIGGER tgr_atualizar_salario
     BEFORE INSERT OR UPDATE
     ON db_funcionario
     FOR EACH ROW
 EXECUTE FUNCTION fn_atualizar_salario;
+
+
+CREATE OR REPLACE FUNCTION fn_alteracao_salario()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_funcionario TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome_funcionario
+    FROM db_pessoa
+    WHERE id_pessoa = NEW.id_pessoa;
+
+    IF (tg_op = 'UPDATE') THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario)
+        VALUES (OLD.matricula, v_nome_funcionario, OLD.salario, NEW.salario, CURRENT_USER);
+    END IF;
+
+    IF (tg_op = 'INSERT') THEN
+        INSERT INTO db_log_alteracao_salario(matricula, nome_funcionario, salario_antigo, salario_novo, usuario);
+        VALUES (old.matricula, v_nome_funcionario, 0, new.salario, CURRENT_USER);
+    END IF;
+
+    RETURN new;
+END;
+$$
+    LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_alteracao_salario
+    BEFORE INSERT OR UPDATE
+    ON db_log_alteracao_salario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_alteracao_salario();
+
+
+CREATE OR REPLACE FUNCTION fn_validar_preco_produto()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 50 OR new.preco > 10000 THEN
+        RAISE EXCEPTION 'Erro. Preço não pode ser menor que R$50.00 ou maior que R$10000';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_validar_preco_produto
+    BEFORE INSERT OR UPDATE
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validar_preco_produto();
 
 
 CREATE OR REPLACE FUNCTION fn_validar_preco_produto()
@@ -1833,6 +1883,59 @@ FROM db_produto
 LIMIT 2;
 
 
+CREATE OR REPLACE FUNCTION fn_atualizar_dados()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF (tg_op = 'DELETE' OR tg_op = 'UPDATE') AND old.ativo = FALSE THEN
+        RAISE EXCEPTION 'Erro. Operação não permitida, cadastro inativo.';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_dados
+    BEFORE DELETE OR UPDATE
+    ON db_pessoa
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_dados();
+
+
+CREATE OR REPLACE FUNCTION fn_atualizar_total_db_vendas()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_total_venda NUMERIC(12, 2);
+    v_id_venda    INTEGER;
+BEGIN
+
+    IF (tg_op = 'DELETE') THEN
+        v_id_venda = old.id_venda;
+        RAISE EXCEPTION 'Erro. Exclusão proibida';
+    ELSE
+        v_id_venda = new.id_venda;
+    END IF;
+
+    SELECT COALESCE(SUM(preco_unitario * quantidade), 0)
+    INTO v_total_venda
+    FROM db_produto_venda
+    WHERE id_venda = v_id_venda;
+
+    UPDATE db_venda
+    SET total = v_total_venda
+    WHERE id_venda = v_id_venda;
+
+    RETURN COALESCE(new, old);
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_atualizar_total_db_vendas
+    BEFORE INSERT OR UPDATE OR DELETE
+    ON db_produto_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_atualizar_total_vendas();
+
+
 
 CREATE FUNCTION fn_atualizar_dados()
     RETURNS TRIGGER AS
@@ -1844,6 +1947,66 @@ BEGIN
     RETURN COALESCE(NEW, OLD);
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION fn_proibido_excluir_tabela()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir tabelas.';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_proibido_excluir_tabela
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_proibido_excluir_tabela();
+
+
+CREATE TABLE db_log_create_table_test_2
+(
+    nome         TEXT NOT NULL,
+    usuario      TEXT NOT NULL,
+    data_criacao TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_log_create_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_table_test_2(nome, usuario)
+    SELECT objid::REGCLASS::TEXT, CURRENT_USER
+    FROM pg_event_trigger_ddl_commands();
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+CREATE EVENT TRIGGER tgr_create_table
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION fn_log_create_table();
+
+
+set ROLE fmartins;
+
+select "current_user"();
+select * from db_log_create_table_test_2;
+
+CREATE TABLE db_test03(
+
+);
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '231213';
+CREATE ROLE usuario_Test WITH LOGIN SUPERUSER PASSWORD '123123';
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public from usuario_test;
+GRANT USAGE on SCHEMA public TO usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT ;
+GRANT SELECT, DELETE, INSERT, UPDATE on ALL TABLES IN SCHEMA public TO usuario_test;
+
+
 
 
 
