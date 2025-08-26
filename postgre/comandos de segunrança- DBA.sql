@@ -1988,12 +1988,14 @@ CREATE EVENT TRIGGER tgr_create_table
 EXECUTE FUNCTION fn_log_create_table();
 
 
-set ROLE fmartins;
+SET ROLE fmartins;
 
-select "current_user"();
-select * from db_log_create_table_test_2;
+SELECT "current_user"();
+SELECT *
+FROM db_log_create_table_test_2;
 
-CREATE TABLE db_test03(
+CREATE TABLE db_test03
+(
 
 );
 
@@ -2001,13 +2003,128 @@ CREATE ROLE usuario_test WITH LOGIN PASSWORD '231213';
 CREATE ROLE usuario_Test WITH LOGIN SUPERUSER PASSWORD '123123';
 GRANT CONNECT ON DATABASE postgres TO usuario_test;
 REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
-REVOKE ALL PRIVILEGES ON SCHEMA public from usuario_test;
-GRANT USAGE on SCHEMA public TO usuario_test;
-ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT ;
-GRANT SELECT, DELETE, INSERT, UPDATE on ALL TABLES IN SCHEMA public TO usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOCREATEROLE NOSUPERUSER NOINHERIT;
+GRANT SELECT, DELETE, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '122123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido excluir tabela';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_bloquear_drop_table
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_database()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido excluir banco de dados.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_database
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('DROP DATABASE')
+EXECUTE FUNCTION fn_bloquear_database();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_excluir_schema()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido excluir schema.';
+END;
+
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_proibido_excluir_schema
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('DROP SCHEMA')
+EXECUTE FUNCTION fn_bloquear_excluir_schema();
+
+
+CREATE TABLE db_log_create_tables
+(
+    id_comando   INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nome_tabela  VARCHAR(100) NOT NULL,
+    comando      VARCHAR(50)  NOT NULL,
+    usuario      VARCHAR(50)  NOT NULL,
+    data_criacao TIMESTAMP DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_db_log_create_tables()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_tables(nome_tabela, comando, usuario)
+    SELECT objid::REGCLASS::TEXT AS nome_tabela,
+           command_tag,
+           "current_user"()
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('ALTER TABLE', 'DROP TABLE', 'CREATE TABLE');
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_log_create_tables
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('ALTER TABLE', 'DROP TABLE','CREATE TABLE')
+EXECUTE FUNCTION fn_db_log_create_tables();
+
+
+CREATE OR REPLACE FUNCTION fn_db_log_create_tables()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_create_tables(nome_tabela, comando, usuario)
+    SELECT objid::REGCLASS::TEXT AS nome_tabela,
+           command_tag,
+           CURRENT_USER
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'ALTER TABLE', 'DROP TABLE');
+END;
+$$
+    LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_db_log_create_tables
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('CREATE TABLE', 'ALTER TABLE','DROP TABLE')
+EXECUTE FUNCTION fn_db_log_create_tables();
+
+CREATE TABLE db_test10
+(
+
+);
 
 
 
+ALTER TABLE db_test10
+    ADD COLUMN id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY;
+
+SELECT *
+FROM db_log_create_tables;
+
+CREATE DATABASE superdev_db;
 
 
 
