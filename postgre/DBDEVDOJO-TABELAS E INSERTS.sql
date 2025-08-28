@@ -5,17 +5,7 @@
 --CLIENTE
 
 
-CREATE TABLE DB_PESSOA
-(
-    id_pessoa integer generated always as identity primary key,
-    nome      varchar(100)       not null,
-    cpf       varchar(11) unique not null check (cpf <> ''),
-    sexo      char(1) check (sexo <> ''),
-    email     varchar(50)        not null,
-    constraint check_email check (email <> ''),
-    constraint check_cpf check (cpf ~ '^\d{11}$'),
-    constraint check_sexo check (UPPER(SEXO) = 'M' or UPPER(SEXO) = 'F')
-);
+
 
 create table DB_ENDERECO
 (

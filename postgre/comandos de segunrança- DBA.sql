@@ -2388,6 +2388,142 @@ ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER;
 GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
 
 
+CREATE OR REPLACE FUNCTION fn_bloquer_exclusao_sistema()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_tabelas(tabela, comando, usuario)
+    SELECT objid::REGCLASS::TEXT,
+           command_tag,
+           CURRENT_USER
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('DROP TABLE', 'ALTER TABLE', 'CREATE TABLE');
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_proibido_excluir_dados_sistema
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('DROP TABLE','ALTER TABLE','CREATE TABLE')
+EXECUTE FUNCTION fn_bloquer_exclusao_sistema();
+
+
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, SELECT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+---------
+
+CREATE OR REPLACE FUNCTION fn_db_log_alteracao_tablela()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO db_log_tabelas(tabela, comando, usuario)
+    SELECT objid::REGCLASS::TEXT,
+           command_tag,
+           CURRENT_USER
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('ALTER TABLE', 'DROP TABLE', 'CREATE TABLE');
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_db_log_alteracao_tabela
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('ALTER TABLE','DROP TABLE','CREATE TABLE')
+EXECUTE FUNCTION fn_db_log_create_tables();
+
+------
+
+CREATE OR REPLACE FUNCTION fn_proibido_alteracao_tabela()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido excluir tabela.';
+END;
+$$ LANGUAGE plpgsql;
+
+
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        FOR tabela IN
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public'
+            LOOP
+                EXECUTE FORMAT(
+                        'CREATE OR REPLACE TRIGGER tgr_proibido_excluir_alterar_dados_tabela%I
+                         BEFORE DELETE
+                         ON %I
+                         EXECUTE FUNCTION fn_proibido_excluir_dados_tabela();'
+                    , tabela.tablename, tabela.tablename);
+            END LOOP;
+    END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION fn_proibido_alteracao_tabelas()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido alteração na estrutura da tabela.';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_proibido_alteracao_tabelas
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_proibido_alteracao_tabelas();
+
+-------
+
+CREATE OR REPLACE TRIGGER tgr_proibido_excluir_alterar_dados_tabela
+    BEFORE DELETE
+    ON db_test
+EXECUTE FUNCTION fn_proibido_excluir_dados_tabela();
+
+DO
+$$
+    DECLARE
+        tbl RECORD;
+    BEGIN
+        FOR tbl IN
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public'
+            LOOP
+                EXECUTE FORMAT(
+                        'CREATE OR REPLACE TRIGGER tgr_proibido_exclusao_tabela_%I
+                        BEFORE DELETE
+                        ON %I
+                        FOR EACH ROW
+                        EXECUTE FUNCTION fn_proibido_excluir_dados_tabelas();'
+                    , tbl.tablename, tbl.tablename);
+            END LOOP;
+    END;
+$$;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
