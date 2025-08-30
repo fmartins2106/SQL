@@ -266,7 +266,7 @@ CREATE OR REPLACE FUNCTION fn_log_alteracao_salarial()
     RETURNS TRIGGER AS
 $$
 BEGIN
-    IF new.salario <> old.salario or old.salario IS NULL THEN
+    IF new.salario <> old.salario OR old.salario IS NULL THEN
         IF (tg_op = 'INSERT') THEN
             INSERT INTO administration.log_alteracao_salarial(matricula, salario_antigo, novo_salario)
             VALUES (new.matricula, 0, new.salario);
@@ -288,28 +288,206 @@ CREATE OR REPLACE TRIGGER tgr_log_alteracao_salarial
 EXECUTE FUNCTION fn_log_alteracao_salarial();
 
 
-SELECT * FROM db_funcionario order by matricula desc;
+SELECT *
+FROM db_funcionario
+ORDER BY matricula DESC;
 
-select * from administration.log_alteracao_salarial;
+SELECT *
+FROM administration.log_alteracao_salarial;
 
-update db_funcionario SET salario = 1999.99 where matricula = 1035;
+UPDATE db_funcionario
+SET salario = 1999.99
+WHERE matricula = 1035;
 
 DROP TRIGGER tgr_log_demissao ON db_funcionario;
 
 INSERT INTO DB_FUNCIONARIO
 (id_pessoa, data_admissao, data_demissao, salario, id_cargo, id_departamento, id_nivel_funcionario)
-VALUES
-(44, '2020-01-15', NULL, 2500.00, 1, 1, 3);
+VALUES (44, '2020-01-15', NULL, 2500.00, 1, 1, 3);
 
 
 CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
 CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
-REVOKE ALL PRIVILEGES ON DATABASE postgres from usuario_test;
-REVOKE ALL PRIVILEGES on SCHEMA public from usuario_test;
-REVOKE ALL PRIVILEGES ON SCHEMA administration from usuario_test;
-ALTER ROLE usuario_test NOINHERIT NOCREATEDB NOSUPERUSER NOSUPERUSER ;
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA administration FROM usuario_test;
+ALTER ROLE usuario_test NOINHERIT NOCREATEDB NOSUPERUSER NOSUPERUSER;
 GRANT CONNECT ON DATABASE postgres TO usuario_test;
 GRANT USAGE ON SCHEMA public TO usuario_test;
 GRANT SELECT, UPDATE, INSERT, DELETE ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+-- 10. Bloquear alteração de documento fiscal em vendas
+
+CREATE OR REPLACE FUNCTION fn_bloquear_alteracao_db_venda()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido efetuar alteração na tabela venda.';
+END;
+$$ LANGUAGE plpgsql;
+
+DROP FUNCTION fn_bloquear_alteracao_db_venda();
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_alteracao_db_venda
+    BEFORE UPDATE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_alteracao_db_venda();
+
+
+-- 10. Bloquear exclusão dados de qualquer tabela.
+
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        FOR tabela IN
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public'
+            LOOP
+                EXECUTE FORMAT(
+                        'CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_exclusao_tabela_%I
+                         BEFORE DELETE OR UPDATE
+                         ON %I
+                         FOR EACH ROW
+                         EXECUTE FUNCTION fn_proibido_alteracao_exclusao_tabelas();'
+                    , tabela.tablename, tabela.tablename);
+            END LOOP;
+    END;
+$$;
+
+CREATE OR REPLACE FUNCTION fn_proibido_alteracao_exclusao_tabelas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido excluir dados da tabela.';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_exclusao_tabelas
+    BEFORE DELETE OR UPDATE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_alteracao_exclusao_tabelas();
+
+-- teste refazendo bloquear alteração e exclusão de dados das tabelas.
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public';
+        LOOP
+            EXECUTE FORMAT(
+                    '
+                    CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_exclusao_dados_tabela_%I
+                    BEFORE UPDATE OR DELETE
+                    ON %I
+                    FOR EACH ROW
+                    EXECUTE FUNCTION fn_proibido_alteracao_exclusao_tabelas();'
+                , tabela.tablename, tabela.tablename);
+        END LOOP;
+    END;
+$$;
+
+
+CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_exclusao_dados_tabela
+    BEFORE UPDATE OR DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_alteracao_exclusao_tabelas();
+
+
+--EVENT TRIGGERS
+
+-- 1. Bloquear ALTER TABLE
+CREATE OR REPLACE FUNCTION fn_bloquear_alteracao_tabelas()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido efetuar alteração nas tabelas. Converse com o administrador do sistema.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_alteracao_tabelas
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_bloquear_alteracao_tabelas();
+
+ALTER TABLE db_venda
+    ADD COLUMN atividade BOOLEAN;
+
+-- 2. Bloquear DROP TABLE
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido efetuar exclusão de tabelas do banco de dados.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_drop_table
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+
+-- 3. Bloquear CREATE table fora do horario
+
+CREATE OR REPLACE FUNCTION fn_bloquear_create_table_fora_horario()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    IF EXTRACT(HOUR FROM NOW()) NOT BETWEEN 0 AND 19 THEN
+        RAISE EXCEPTION 'Proibido create table fora do horário de funcionamento da empresa(8-18). Consulte o DBA.';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER trg_bloquear_create_table_fora_horario
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('CREATE TABLE')
+EXECUTE FUNCTION fn_bloquear_create_table_fora_horario();
+
+CREATE TABLE teste100
+(
+    id INTEGER NOT NULL
+);
+
+-- 3. log alter, drop and CREATE table.
+
+CREATE TABLE administration.log_alter_create_drop_table
+(
+    id_altecao    INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    tabela        VARCHAR(100) NOT NULL,
+    comando       VARCHAR(50)  NOT NULL,
+    usuario       VARCHAR(50)  NOT NULL DEFAULT CURRENT_USER,
+    data_execucao TIMESTAMP    NOT NULL DEFAULT NOW()
+);
+
+
+CREATE OR REPLACE FUNCTION fn_log_alter_create_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO administration.log_alter_create_drop_table(tabela, comando)
+    SELECT objid::REGCLASS::TEXT,
+           command_tag
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('CREATE TABLE', 'DROP TABLE', 'ALTER TABLE');
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_log_alter_create_drop_table
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('CREATE TABLE','DROP TABLE','ALTER TABLE')
+EXECUTE FUNCTION fn_log_alter_create_drop_table();
+
 
 
