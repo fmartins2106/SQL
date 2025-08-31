@@ -104,6 +104,25 @@ CREATE OR REPLACE TRIGGER tgr_validando_salario_minimo
     FOR EACH ROW
 EXECUTE FUNCTION fn_validando_salario_minimo();
 
+---------------
+CREATE OR REPLACE FUNCTION fn_validacao_salario_minimo()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.salario < 1510 THEN
+        RAISE EXCEPTION 'Erro salário não pode ser menor que salário minímo vigente.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_validacao_salario_minimo
+    BEFORE INSERT OR UPDATE OF salario
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validando_salario_minimo();
+
+
 -- 2. Data de demissão >= admissão
 CREATE OR REPLACE FUNCTION fn_validando_data_demissao()
     RETURNS TRIGGER AS
@@ -123,6 +142,27 @@ CREATE OR REPLACE TRIGGER tgr_validando_data_demissao
     ON db_funcionario
     FOR EACH ROW
 EXECUTE FUNCTION fn_validando_data_demissao();
+
+------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_validando_data_demissao()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_demissao < old.data_admissao OR new.data_demissao > CURRENT_DATE THEN
+        RAISE EXCEPTION 'Erro. Data de demissão deve ser maior que data de admissão.';
+    ELSE
+        new.ativo = FALSE;
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_validando_data_demissao
+    BEFORE UPDATE OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_validando_data_demissao();
+
 
 -- 3. Log exclusão de cliente
 
@@ -181,6 +221,47 @@ SELECT *
 FROM db_cliente
 LIMIT 3;
 
+-----------------------------------------------------
+CREATE TABLE log_exclusao_cliente
+(
+    id_exclusao_cliente INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    id_cliente          INTEGER      NOT NULL,
+    nome_cliente        VARCHAR(100) NOT NULL,
+    usuario             VARCHAR(30)  NOT NULL DEFAULT CURRENT_USER,
+    data_execucao       TIMESTAMP    NOT NULL DEFAULT NOW(),
+    CONSTRAINT FK_id_cliente FOREIGN KEY (id_cliente) REFERENCES db_cliente (id_cliente)
+);
+
+CREATE OR REPLACE FUNCTION fn_exclusao_cliente()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome_cliente TEXT;
+BEGIN
+
+    IF new.ativo = FALSE AND old.ativo = TRUE THEN
+
+        SELECT p.nome
+        INTO v_nome_cliente
+        FROM db_cliente f
+                 INNER JOIN db_pessoa p
+                            ON f.id_pessoa = p.id_pessoa
+        WHERE f.id_cliente = new.id_cliente;
+
+        INSERT INTO log_exclusao_cliente(id_cliente, nome_cliente)
+        VALUES (old.id_cliente, v_nome_cliente);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_exclusao_cliente
+    AFTER UPDATE OF ativo
+    ON db_cliente
+    FOR EACH ROW
+EXECUTE FUNCTION fn_exclusao_cliente();
+
 
 -- 4. Bloquear exclusão de vendas
 
@@ -193,6 +274,22 @@ CREATE OR REPLACE FUNCTION fn_bloquear_exclusao_venda()
 $$
 BEGIN
     RAISE EXCEPTION 'Proibido excluir dados da venda.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_exclusao_venda
+    BEFORE DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_exclusao_venda();
+
+----------------------------------------
+CREATE OR REPLACE FUNCTION fn_bloquear_exclusao_venda()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar exclusão da venda. Usar opção inativar.';
     RETURN old;
 END;
 $$ LANGUAGE plpgsql;
@@ -228,6 +325,24 @@ SELECT *
 FROM db_produto
 LIMIT 3;
 
+---------------------------------
+CREATE OR REPLACE FUNCTION fn_valor_produto_menor_zero()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 0 OR new.preco > 10000 THEN
+        RAISE EXCEPTION 'Erro. Valor do produto não pode ser menor que zero ou maior que R$10000';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_valor_produto_menor_zero
+    BEFORE INSERT OR UPDATE OF preco
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_valor_produto_menor_zero();
 
 -- 6. valor_venda_menor_que_zero
 
@@ -248,6 +363,23 @@ CREATE OR REPLACE TRIGGER tgr_valor_produto_menor_zero
     FOR EACH ROW
 EXECUTE FUNCTION fn_valor_total_venda_menor_zero();
 
+----------------------------------------
+CREATE OR REPLACE FUNCTION fn_valor_total_venda_menor_zero()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.total < 0 THEN
+        RAISE EXCEPTION 'Erro. valor total da venda não pode ser menor que zero.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_valor_total_venda_menor_zero
+    BEFORE INSERT OR UPDATE OF total
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_valor_total_venda_menor_zero();
 
 -- 7. Log de alterações salariais
 
@@ -287,6 +419,51 @@ CREATE OR REPLACE TRIGGER tgr_log_alteracao_salarial
     FOR EACH ROW
 EXECUTE FUNCTION fn_log_alteracao_salarial();
 
+----------------------------------------
+CREATE TABLE administration.log_alteracao_salario
+(
+    id_alteracao_salario INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    matricula            INTEGER       NOT NULL,
+    nome_funcionario     VARCHAR(100)  NOT NULL,
+    salario_antigo       NUMERIC(7, 2) NOT NULL,
+    novo_salario         NUMERIC(7, 2) NOT NULL,
+    usuario              VARCHAR(30)   NOT NULL DEFAULT CURRENT_USER,
+    data_alteracao       TIMESTAMP     NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_funcionario_log_alteracao_salario FOREIGN KEY (matricula) REFERENCES db_funcionario (matricula)
+);
+
+CREATE OR REPLACE FUNCTION fn_log_alteracao_salario()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+    v_nome TEXT;
+BEGIN
+    SELECT nome
+    INTO v_nome
+    FROM db_funcionario f
+             INNER JOIN db_pessoa p
+                        ON p.id_pessoa = f.id_pessoa
+    WHERE f.matricula = COALESCE(old.matricula, new.matricula);
+
+    IF (tg_op = 'UPDATE') THEN
+        INSERT INTO administration.log_alteracao_salario(matricula, nome_funcionario, salario_antigo, novo_salario)
+        VALUES (old.matricula, v_nome, old.salario, new.salario);
+    END IF;
+
+    IF (tg_op = 'INSERT') THEN
+        INSERT INTO administration.log_alteracao_salario(matricula, nome_funcionario, salario_antigo, novo_salario)
+        VALUES (old.matricula, v_nome, 0, new.salario);
+    END IF;
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_log_alteracao_salario
+    AFTER UPDATE OF salario OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_log_alteracao_salarial();
+
 
 SELECT *
 FROM db_funcionario
@@ -305,7 +482,7 @@ INSERT INTO DB_FUNCIONARIO
 (id_pessoa, data_admissao, data_demissao, salario, id_cargo, id_departamento, id_nivel_funcionario)
 VALUES (44, '2020-01-15', NULL, 2500.00, 1, 1, 3);
 
-
+--------------
 CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
 CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
 REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
@@ -334,6 +511,21 @@ CREATE OR REPLACE TRIGGER tgr_bloquear_alteracao_db_venda
     FOR EACH ROW
 EXECUTE FUNCTION fn_bloquear_alteracao_db_venda();
 
+
+CREATE OR REPLACE FUNCTION fn_bloquear_alteracao_db_venda()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar alteração em notas fiscais. Efetuar cancelamento.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_alteraca_db_venda
+    BEFORE UPDATE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_alteracao_db_venda();
 
 -- 10. Bloquear exclusão dados de qualquer tabela.
 
@@ -372,6 +564,44 @@ CREATE OR REPLACE TRIGGER tgr_proibido_alteracao_exclusao_tabelas
     ON db_venda
     FOR EACH ROW
 EXECUTE FUNCTION fn_proibido_alteracao_exclusao_tabelas();
+
+---------------------------------------------------------------
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        FOR tabela IN
+            SELECT tablename
+            FROM pg_tables
+            WHERE schemaname = 'public'
+            LOOP
+                EXECUTE FORMAT('CREATE OR REPLACE TRIGGER tgr_proibido_exclusao_tabelas
+                            BEFORE DELETE
+                            ON db_venda
+                            FOR EACH ROW
+                            EXECUTE FUNCTION fn_proibido_exclusao_tabelas();'
+                        ,tabela.tablename, tabela.tablename);
+            END LOOP;
+    END;
+
+$$;
+
+CREATE OR REPLACE FUNCTION fn_proibido_exclusao_tabelas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar exclusão de dados na tabela.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_proibido_exclusao_tabelas
+    BEFORE DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_proibido_exclusao_tabelas();
+
 
 -- teste refazendo bloquear alteração e exclusão de dados das tabelas.
 DO
