@@ -1341,3 +1341,4 @@ CREATE OR REPLACE TRIGGER trg_iniciar_venda_ativo_true
     ON db_venda
     FOR EACH ROW
 EXECUTE FUNCTION fn_iniciar_venda_ativa();
+
