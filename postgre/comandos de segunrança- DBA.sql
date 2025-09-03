@@ -2512,6 +2512,117 @@ $$
 $$;
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '123123';
+REVOKE ALL PRIVILEGES ON DATABASE prostgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEDB NOINHERIT NOCREATEROLE NOSUPERUSER NOCREATEUSER;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, UPDATE, DELETE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro, proibido efetuar exclusão de tabelas.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_drop_table
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_alter_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar alteração na estrutura da tabela sem permissão prévia';
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE EVENT TRIGGER tgr_bloquear_alter_tabela
+    ON DDL_COMMAND_START
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_bloquear_alter_table();
+
+
+CREATE SCHEMA IF NOT EXISTS administration;
+
+CREATE TABLE administration.log_comandos
+(
+    id_alteracao  INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    comando       VARCHAR(20) NOT NULL,
+    tabela        VARCHAR(20) NOT NULL,
+    usuario       VARCHAR(20) NOT NULL DEFAULT CURRENT_USER,
+    data_execucao TIMESTAMP   NOT NULL DEFAULT NOW()
+);
+
+CREATE OR REPLACE FUNCTION fn_log_comandos()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    INSERT INTO administration.log_comandos(comando, tabela)
+    SELECT command_tag,
+           object_identity
+    FROM pg_event_trigger_ddl_commands()
+    WHERE command_tag IN ('DROP TABLE', 'ALTER TABLE', 'CREATE TABLE');
+
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_log_comandos
+    ON DDL_COMMAND_END
+    WHEN TAG IN ('DROP TABLE','ALTER TABLE','CREATE TABLE')
+EXECUTE FUNCTION fn_log_comandos();
+
+
+DO
+$$
+    DECLARE
+        nome_tabela RECORD;
+    BEGIN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public';
+        LOOP
+            EXECUTE FORMAT(
+           'CREATE OR REPLACE TRIGGER tgr_bloquear_deleta_from_tabela_%I
+            BEFORE DELETE OR TRUNCATE
+            ON %I
+            FOR EACH ROW
+            EXECUTE FUNCTION fn_bloquear_delete_from_tabelas();'
+            ,nome_tabela.tablename,nome_tabela.tablename);
+        END LOOP;
+    END;
+$$;
+
+CREATE OR REPLACE FUNCTION fn_bloquear_delete_from_tabelas()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar exclusão de dados do sistema.';
+    RETURN old;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_deleta_from_tabelas
+    BEFORE DELETE OR TRUNCATE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_delete_from_tabelas();
+
+
+
+
+
+
+
+
+
 
 
 
