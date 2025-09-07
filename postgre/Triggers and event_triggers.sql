@@ -155,6 +155,159 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE ROLE usuario_test WITH LOGIN PASSWORD '123123';
+CREATE ROLE usuario_test WITH LOGIN SUPERUSER PASSWORD '1231213';
+REVOKE ALL PRIVILEGES ON DATABASE postgres FROM usuario_test;
+REVOKE ALL PRIVILEGES ON SCHEMA public FROM usuario_test;
+ALTER ROLE usuario_test NOCREATEUSER NOINHERIT NOCREATEDB NOCREATEROLE;
+GRANT CONNECT ON DATABASE postgres TO usuario_test;
+GRANT USAGE ON SCHEMA public TO usuario_test;
+GRANT SELECT, DELETE, UPDATE, INSERT ON ALL TABLES IN SCHEMA public TO usuario_test;
+
+
+CREATE OR REPLACE FUNCTION fn_bloquear_drop_table()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Proibido efetuar drop table.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_drop_table
+    ON SQL_DROP
+    WHEN TAG IN ('DROP TABLE')
+EXECUTE FUNCTION fn_bloquear_drop_table();
+
+CREATE OR REPLACE FUNCTION fn_bloquer_alteracao_tabela()
+    RETURNS EVENT_TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar alterações na tabela.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE EVENT TRIGGER tgr_bloquear_alteracao_tabela
+    ON SQL_DROP
+    WHEN TAG IN ('ALTER TABLE')
+EXECUTE FUNCTION fn_bloquear_alteracao_tabelas();
+
+
+--------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION fn_bloquear_delete_from()
+    RETURNS TRIGGER AS
+$$
+DECLARE
+BEGIN
+    RAISE EXCEPTION 'Erro. Proibido efetuar exclusão de dados da tabela.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_delete_from
+    BEFORE DELETE
+    ON db_venda
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_delete_from();
+
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public';
+        LOOP
+            EXECUTE FORMAT('
+            CREATE OR REPLACE TRIGGER tgr_bloquear_delete_from_table_%I
+            BEFORE DELETE
+            ON %I
+            FOR EACH ROW
+            EXECUTE FUNCTION fn_bloquear_delete_from();'
+                , tabela.tablename, tabela.tablename);
+        END LOOP;
+    END;
+$$ LANGUAGE plpgsql;
+
+---------------------------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION fn_bloquear_truncade()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    RAISE EXCEPTION 'Erro. proibido efetuar alteração nas colunas das tabelas.';
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_alteracao_colunas_tabela
+    BEFORE TRUNCATE
+    ON db_venda
+    FOR EACH STATEMENT
+EXECUTE FUNCTION fn_bloquear_truncade();
+
+DO
+$$
+    DECLARE
+        tabela RECORD;
+    BEGIN
+        SELECT tablename
+        FROM pg_tables
+        WHERE schemaname = 'public';
+        LOOP
+            EXECUTE FORMAT('
+            CREATE OR REPLACE TRIGGER tgr_bloquear_alteracao_colunas_tabela_%I
+            BEFORE TRUNCATE
+            ON %I
+            FOR EACH ROW
+            EXECUTE FUNCTION fn_bloquear_truncade();'
+                , tabela.tablename, tabela.tablename);
+        END LOOP;
+    END;
+$$;
+
+
+CREATE OR REPLACE FUNCTION fn_bloquear_valores_menores_zero()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.preco < 0 THEN
+        RAISE EXCEPTION 'Erro. Valor não pode ser menor que zero.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_valores_menores_zero
+    BEFORE UPDATE OF preco OR INSERT
+    ON db_produto
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_valores_menores_zero();
+
+CREATE OR REPLACE FUNCTION fn_bloquear_data_demissao_errada()
+    RETURNS TRIGGER AS
+$$
+BEGIN
+    IF new.data_demissao < old.data_admissao OR new.data_demissao < CURRENT_DATE THEN
+        RAISE EXCEPTION 'Erro. data de demissão não pode ser menor que data de admissão ou maior que data atual.';
+    END IF;
+    RETURN new;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER tgr_bloquear_data_demissao_errada
+    BEFORE UPDATE OF data_admissao OR INSERT
+    ON db_funcionario
+    FOR EACH ROW
+EXECUTE FUNCTION fn_bloquear_data_demissao_errada();
+
+
+
+
+
+
+
 
 
 
