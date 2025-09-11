@@ -1,6 +1,3 @@
-
-
-
 CREATE TABLE departamento
 (
     id_departamento   INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -59,13 +56,14 @@ CREATE TABLE telefone
     tipo_telefone   VARCHAR(30) NOT NULL CHECK ( tipo_telefone <> '' ),
     ddd             VARCHAR(3)  NOT NULL CHECK ( ddd <> '' ),
     numero_telefone VARCHAR(9)  NOT NULL CHECK ( numero_telefone <> '' ),
-    id_pessoa      INTEGER     NOT NULL,
+    id_pessoa       INTEGER     NOT NULL,
     status_cadastro BOOLEAN     NOT NULL DEFAULT TRUE,
     CONSTRAINT FK_cliente_telefone FOREIGN KEY (id_pessoa) REFERENCES pessoa (id_pessoa)
 );
 
 
-# ENDERECO
+#
+ENDERECO
 
 CREATE TABLE uf
 (
